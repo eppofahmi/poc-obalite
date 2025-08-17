@@ -46,7 +46,7 @@
   </table>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Record<string, unknown>">
 import { ChevronsUpDown } from 'lucide-vue-next'
 
 export interface TableColumn {
@@ -60,37 +60,42 @@ export interface TableColumn {
 
 interface Props {
   columns: TableColumn[]
-  data: any[]
-  rowKey?: string | ((row: any, index: number) => string | number)
+  data: T[]
+  rowKey?: string | ((row: T, index: number) => string | number)
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   sort: [column: string]
-  rowClick: [item: any, index: number]
+  rowClick: [item: T, index: number]
 }>()
 
 const handleSort = (column: string) => {
   emit('sort', column)
 }
 
-const handleRowClick = (item: any, index: number) => {
+const handleRowClick = (item: T, index: number) => {
   emit('rowClick', item, index)
 }
 
-const getRowKey = (item: any, index: number): string | number => {
+const getRowKey = (item: T, index: number): string | number => {
   if (typeof props.rowKey === 'function') {
     return props.rowKey(item, index)
   }
-  if (props.rowKey && item[props.rowKey]) {
-    return item[props.rowKey]
+  if (props.rowKey && item[props.rowKey as keyof T]) {
+    return item[props.rowKey as keyof T] as string | number
   }
   return index
 }
 
-const getNestedValue = (obj: any, path: string): any => {
-  return path.split('.').reduce((current, key) => current?.[key], obj)
+const getNestedValue = (obj: T, path: string): unknown => {
+  return path.split('.').reduce((current: unknown, key: string) => {
+    if (current && typeof current === 'object' && key in current) {
+      return (current as Record<string, unknown>)[key]
+    }
+    return undefined
+  }, obj)
 }
 </script>
 

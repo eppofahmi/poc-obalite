@@ -55,28 +55,28 @@
       >
         <!-- Question Column -->
         <template #cell-pertanyaan="{ value }">
-          <div class="question-cell" :title="value">
+          <div class="question-cell" :title="value as string">
             {{ value }}
           </div>
         </template>
 
         <!-- Type Column -->
         <template #cell-jenis="{ value }">
-          <span :class="['type-badge', value.toLowerCase().replace(' ', '-')]">
+          <span :class="['type-badge', (value as string).toLowerCase().replace(' ', '-')]">
             {{ value }}
           </span>
         </template>
 
         <!-- Difficulty Column -->
         <template #cell-tingkatKesulitan="{ value }">
-          <span :class="['difficulty-badge', value.toLowerCase()]">
+          <span :class="['difficulty-badge', (value as string).toLowerCase()]">
             {{ value }}
           </span>
         </template>
 
         <!-- Date Column -->
         <template #cell-tanggalDibuat="{ value }">
-          {{ formatDate(value) }}
+          {{ formatDate(value as string) }}
         </template>
 
         <!-- Actions Column -->
@@ -310,8 +310,6 @@ const paginatedSoalList = computed(() => {
   return filteredSoalList.value.slice(start, end)
 })
 
-// For backward compatibility in modal
-const filteredSoal = computed(() => filteredSoalList.value)
 
 // Methods
 const handleSort = (column: string) => {

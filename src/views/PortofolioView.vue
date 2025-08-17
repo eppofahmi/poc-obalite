@@ -241,7 +241,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Search, Plus } from 'lucide-vue-next'
 import StandardLayout from '../components/StandardLayout.vue'
 import { portofolioApi } from '../services/api'
@@ -254,7 +254,7 @@ const penelitianList = ref<Penelitian[]>([])
 const pengabdianList = ref<Pengabdian[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
-const { showSuccess, showError } = useNotifications()
+const { showError } = useNotifications()
 
 // Filter states
 const searchQuery = ref('')
@@ -319,23 +319,64 @@ const newPengabdian = ref({
 })
 
 const addPublikasi = () => {
-  const id = Math.max(...publikasiList.value.map(p => p.id)) + 1
-  publikasiList.value.push({ id, ...newPublikasi.value })
+  const maxId = Math.max(...publikasiList.value.map(p => parseInt(p.id.split('-')[1] || '0')))
+  const id = `pub-${String(maxId + 1).padStart(3, '0')}`
+  const now = new Date().toISOString()
+  
+  publikasiList.value.push({
+    id,
+    ...newPublikasi.value,
+    penulis: [newPublikasi.value.penulis], // Convert string to array
+    status: newPublikasi.value.status as 'Draft' | 'Published' | 'Submitted' | 'Under Review',
+    keywords: [],
+    dosenId: 'user-002',
+    createdAt: now,
+    updatedAt: now
+  })
+  
   newPublikasi.value = { judul: '', jurnal: '', tahun: new Date().getFullYear(), penulis: '', status: 'Draft' }
   showPublikasiModal.value = false
 }
 
 const addPenelitian = () => {
-  const id = Math.max(...penelitianList.value.map(p => p.id)) + 1
+  const maxId = Math.max(...penelitianList.value.map(p => parseInt(p.id.split('-')[1] || '0')))
+  const id = `pen-${String(maxId + 1).padStart(3, '0')}`
   const status = newPenelitian.value.tahunSelesai ? 'Selesai' : 'Berjalan'
-  penelitianList.value.push({ id, ...newPenelitian.value, status })
+  const now = new Date().toISOString()
+  
+  penelitianList.value.push({
+    id,
+    ...newPenelitian.value,
+    jenis: newPenelitian.value.jenis as 'Fundamental' | 'Terapan' | 'Pengembangan',
+    status: status as 'Berjalan' | 'Selesai' | 'Ditunda' | 'Dibatalkan',
+    timPeneliti: ['Current User'],
+    keywords: [],
+    jumlahDana: 0,
+    abstrak: '',
+    dosenId: 'user-002',
+    createdAt: now,
+    updatedAt: now
+  })
+  
   newPenelitian.value = { judul: '', jenis: '', tahunMulai: new Date().getFullYear(), tahunSelesai: undefined, sumberDana: '' }
   showPenelitianModal.value = false
 }
 
 const addPengabdian = () => {
-  const id = Math.max(...pengabdianList.value.map(p => p.id)) + 1
-  pengabdianList.value.push({ id, ...newPengabdian.value, status: 'Selesai' })
+  const maxId = Math.max(...pengabdianList.value.map(p => parseInt(p.id.split('-')[1] || '0')))
+  const id = `peng-${String(maxId + 1).padStart(3, '0')}`
+  const now = new Date().toISOString()
+  
+  pengabdianList.value.push({
+    id,
+    ...newPengabdian.value,
+    status: 'Selesai' as 'Berjalan' | 'Selesai' | 'Direncanakan',
+    timPelaksana: ['Current User'],
+    dosenId: 'user-002',
+    createdAt: now,
+    updatedAt: now
+  })
+  
   newPengabdian.value = { judul: '', lokasi: '', tahun: new Date().getFullYear(), jumlahPeserta: 1 }
   showPengabdianModal.value = false
 }

@@ -114,7 +114,7 @@ const handleLogin = async () => {
       error.value = 'Invalid email or password'
       showError('Email atau password tidak valid')
     }
-  } catch (err) {
+  } catch {
     error.value = 'An error occurred during login'
     showError('Terjadi kesalahan saat login')
   } finally {

@@ -5,7 +5,7 @@
 // Backend developers should implement APIs matching these interfaces
 
 // Base Response Structure
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   message: string
   data: T
@@ -13,7 +13,7 @@ export interface ApiResponse<T = any> {
   timestamp: string
 }
 
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   success: boolean
   message: string
   data: T[]

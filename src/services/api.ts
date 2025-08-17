@@ -14,7 +14,6 @@ import type {
   CreateMataKuliahRequest,
   UpdateMataKuliahRequest,
   RPS,
-  CreateRPSRequest,
   Soal,
   CreateSoalRequest,
   Publikasi,
@@ -30,14 +29,9 @@ import mataKuliahData from '../data/mata-kuliah.json'
 import rpsData from '../data/rps.json'
 import soalData from '../data/soal.json' 
 import portofolioData from '../data/portofolio.json'
-import { readonly } from 'vue'
 
 // Simulate API delay for realistic demo
 const simulateDelay = (ms: number = 800) => new Promise(resolve => setTimeout(resolve, ms))
-
-// Base API configuration
-const API_BASE_URL = '/api/v1' // Will be actual API base URL in production
-const API_TIMEOUT = 10000
 
 // ==============================
 // AUTHENTICATION API
@@ -51,11 +45,18 @@ export const authApi = {
   async login(request: LoginRequest): Promise<LoginResponse> {
     await simulateDelay(1000) // Simulate network delay
     
-    const user = usersData.users.find(u => u.email === request.email)
+    const userData = usersData.users.find(u => u.email === request.email)
     const validPassword = usersData.mockCredentials[request.email as keyof typeof usersData.mockCredentials]
     
-    if (!user || request.password !== validPassword) {
+    if (!userData || request.password !== validPassword) {
       throw new Error('Invalid email or password')
+    }
+
+    // Type-cast to match interface
+    const user: User = {
+      ...userData,
+      role: userData.role as 'admin' | 'dosen',
+      status: userData.status as 'active' | 'inactive'
     }
 
     const token = `jwt_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -96,7 +97,12 @@ export const authApi = {
     await simulateDelay(600)
     
     // In real app, this would decode JWT token
-    const user = usersData.users[1] // Simulate current user
+    const userData = usersData.users[1] // Simulate current user
+    const user: User = {
+      ...userData,
+      role: userData.role as 'admin' | 'dosen',
+      status: userData.status as 'active' | 'inactive'
+    }
     
     return {
       success: true,
@@ -119,7 +125,10 @@ export const mataKuliahApi = {
   async getAll(filters: FilterParams = {}): Promise<PaginatedResponse<MataKuliah>> {
     await simulateDelay()
     
-    let data = [...mataKuliahData.mataKuliah]
+    let data: MataKuliah[] = mataKuliahData.mataKuliah.map(mk => ({
+      ...mk,
+      status: mk.status as 'Aktif' | 'Persiapan' | 'Nonaktif'
+    }))
     
     // Apply filters
     if (filters.search) {
@@ -185,10 +194,15 @@ export const mataKuliahApi = {
   async getById(id: string): Promise<ApiResponse<MataKuliah>> {
     await simulateDelay(600)
     
-    const mataKuliah = mataKuliahData.mataKuliah.find(mk => mk.id === id)
+    const mkData = mataKuliahData.mataKuliah.find(mk => mk.id === id)
     
-    if (!mataKuliah) {
+    if (!mkData) {
       throw new Error('Mata kuliah not found')
+    }
+
+    const mataKuliah: MataKuliah = {
+      ...mkData,
+      status: mkData.status as 'Aktif' | 'Persiapan' | 'Nonaktif'
     }
     
     return {
@@ -231,15 +245,16 @@ export const mataKuliahApi = {
   async update(id: string, request: UpdateMataKuliahRequest): Promise<ApiResponse<MataKuliah>> {
     await simulateDelay(1000)
     
-    const existingMataKuliah = mataKuliahData.mataKuliah.find(mk => mk.id === id)
+    const existingData = mataKuliahData.mataKuliah.find(mk => mk.id === id)
     
-    if (!existingMataKuliah) {
+    if (!existingData) {
       throw new Error('Mata kuliah not found')
     }
     
     const updatedMataKuliah: MataKuliah = {
-      ...existingMataKuliah,
+      ...existingData,
       ...request,
+      status: (request.status || existingData.status) as 'Aktif' | 'Persiapan' | 'Nonaktif',
       updatedAt: new Date().toISOString()
     }
     
@@ -285,7 +300,10 @@ export const rpsApi = {
   async getAll(filters: FilterParams = {}): Promise<PaginatedResponse<RPS>> {
     await simulateDelay()
     
-    let data = [...rpsData.rps]
+    let data: RPS[] = rpsData.rps.map(rps => ({
+      ...rps,
+      status: rps.status as 'Aktif' | 'Draft' | 'Review' | 'Approved'
+    }))
     
     // Apply filters (similar to mataKuliahApi)
     if (filters.search) {
@@ -334,7 +352,11 @@ export const soalApi = {
   async getAll(filters: FilterParams = {}): Promise<PaginatedResponse<Soal>> {
     await simulateDelay()
     
-    let data = [...soalData.soal]
+    let data: Soal[] = soalData.soal.map(soal => ({
+      ...soal,
+      jenis: soal.jenis as 'Pilihan Ganda' | 'Essay' | 'Praktik' | 'True/False',
+      tingkatKesulitan: soal.tingkatKesulitan as 'Mudah' | 'Sedang' | 'Sulit'
+    }))
     
     // Apply filters
     if (filters.search) {
@@ -415,10 +437,15 @@ export const portofolioApi = {
   async getPublikasi(): Promise<ApiResponse<Publikasi[]>> {
     await simulateDelay()
     
+    const publikasi: Publikasi[] = portofolioData.publikasi.map(pub => ({
+      ...pub,
+      status: pub.status as 'Draft' | 'Published' | 'Submitted' | 'Under Review'
+    }))
+
     return {
       success: true,
       message: 'Publikasi retrieved successfully',
-      data: portofolioData.publikasi,
+      data: publikasi,
       timestamp: new Date().toISOString()
     }
   },
@@ -430,10 +457,16 @@ export const portofolioApi = {
   async getPenelitian(): Promise<ApiResponse<Penelitian[]>> {
     await simulateDelay()
     
+    const penelitian: Penelitian[] = portofolioData.penelitian.map(pen => ({
+      ...pen,
+      jenis: pen.jenis as 'Fundamental' | 'Terapan' | 'Pengembangan',
+      status: pen.status as 'Berjalan' | 'Selesai' | 'Ditunda' | 'Dibatalkan'
+    }))
+
     return {
       success: true,
       message: 'Penelitian retrieved successfully',
-      data: portofolioData.penelitian,
+      data: penelitian,
       timestamp: new Date().toISOString()
     }
   },
@@ -445,10 +478,15 @@ export const portofolioApi = {
   async getPengabdian(): Promise<ApiResponse<Pengabdian[]>> {
     await simulateDelay()
     
+    const pengabdian: Pengabdian[] = portofolioData.pengabdian.map(peng => ({
+      ...peng,
+      status: peng.status as 'Berjalan' | 'Selesai' | 'Direncanakan'
+    }))
+
     return {
       success: true,
       message: 'Pengabdian retrieved successfully',
-      data: portofolioData.pengabdian,
+      data: pengabdian,
       timestamp: new Date().toISOString()
     }
   }
@@ -501,7 +539,10 @@ export const dashboardApi = {
       totalSoal: 4,
       totalPortofolio: 6,
       rpsProgress: 75,
-      mataKuliahAktif: mataKuliahData.mataKuliah.filter(mk => mk.status === 'Aktif').slice(0, 3),
+      mataKuliahAktif: mataKuliahData.mataKuliah
+        .filter(mk => mk.status === 'Aktif')
+        .map(mk => ({ ...mk, status: mk.status as 'Aktif' | 'Persiapan' | 'Nonaktif' }))
+        .slice(0, 3),
       deadlineTerdekat: [
         {
           id: 'deadline-001',
@@ -540,15 +581,16 @@ export class ApiError extends Error {
 /**
  * Generic error handler for API calls
  */
-export const handleApiError = (error: any): never => {
+export const handleApiError = (error: unknown): never => {
   if (error instanceof ApiError) {
     throw error
   }
   
   // Network or other errors
+  const errorObj = error as any
   throw new ApiError(
-    error.message || 'An unexpected error occurred',
-    error.status || 500,
-    error.code || 'UNKNOWN_ERROR'
+    errorObj?.message || 'An unexpected error occurred',
+    errorObj?.status || 500,
+    errorObj?.code || 'UNKNOWN_ERROR'
   )
 }

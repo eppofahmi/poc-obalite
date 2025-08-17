@@ -83,7 +83,7 @@ export const useUserStore = defineStore('user', () => {
         
         // Optionally refresh profile to ensure data is current
         // refreshProfile()
-      } catch (error) {
+      } catch {
         // If parsing fails, clear everything
         logout()
       }

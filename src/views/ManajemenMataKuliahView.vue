@@ -58,7 +58,7 @@
       >
         <!-- Status Column -->
         <template #cell-status="{ value }">
-          <span :class="['status-badge', value.toLowerCase()]">
+          <span :class="['status-badge', (value as string).toLowerCase()]">
             {{ value }}
           </span>
         </template>
@@ -235,7 +235,7 @@ const handleRowClick = (item: MataKuliah, index: number) => {
 }
 
 // Watch for filter changes and refetch data
-const debounceTimer = ref<NodeJS.Timeout | null>(null)
+const debounceTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const debouncedFetch = () => {
   if (debounceTimer.value) {

@@ -47,7 +47,7 @@
       >
         <!-- Status Column -->
         <template #cell-status="{ value }">
-          <span :class="['status-badge', value.toLowerCase()]">
+          <span :class="['status-badge', (value as string).toLowerCase()]">
             {{ value }}
           </span>
         </template>
