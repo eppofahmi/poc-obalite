@@ -1,5 +1,8 @@
 <template>
-  <StandardLayout title="FORM RENCANA PEMBELAJARAN SEMESTER (RPS)" subtitle="Buat Rencana Pembelajaran Semester baru">
+  <StandardLayout 
+    :title="isEditMode ? 'EDIT RENCANA PEMBELAJARAN SEMESTER (RPS)' : 'FORM RENCANA PEMBELAJARAN SEMESTER (RPS)'" 
+    :subtitle="isEditMode ? 'Edit Rencana Pembelajaran Semester' : 'Buat Rencana Pembelajaran Semester baru'"
+  >
     <template #content>
       <div class="rps-form-container">
 
@@ -382,7 +385,7 @@
         </button>
         <span class="tab-indicator">{{ currentTab + 1 }}/{{ tabs.length }}</span>
         <button class="btn-nav btn-primary" @click="nextTab">
-          {{ currentTab === tabs.length - 1 ? 'Simpan' : 'Berikutnya' }}
+          {{ currentTab === tabs.length - 1 ? (isEditMode ? 'Update' : 'Simpan') : 'Berikutnya' }}
         </button>
       </div>
       </div>
@@ -392,12 +395,17 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import StandardLayout from '../components/StandardLayout.vue'
 import { useNotifications } from '../composables/useNotifications'
 
 const router = useRouter()
+const route = useRoute()
 const { showSuccess, showError } = useNotifications()
+
+// Determine mode based on route
+const isEditMode = computed(() => route.name === 'edit-rps')
+const rpsId = computed(() => route.params.id as string)
 
 // Tab configuration
 const tabs = [
@@ -562,23 +570,95 @@ const validateForm = (): boolean => {
   return true
 }
 
+const loadRPSData = (id: string) => {
+  // In a real app, this would load from API
+  // For now, we'll create sample data based on ID
+  const sampleData = {
+    identitas: {
+      kodeMK: 'IF101',
+      namaMK: 'Pemrograman Web',
+      sksTeori: 2,
+      sksPraktik: 1,
+      status: 'wajib',
+      prasyarat: 'Algoritma dan Pemrograman'
+    },
+    deskripsi: 'Mata kuliah ini membahas tentang pengembangan aplikasi web menggunakan teknologi modern termasuk HTML, CSS, JavaScript, dan framework web.',
+    cpl: [
+      { kode: 'CPL1', deskripsi: 'Mahasiswa mampu merancang dan mengembangkan aplikasi web' },
+      { kode: 'CPL2', deskripsi: 'Mahasiswa mampu menerapkan prinsip-prinsip UI/UX' }
+    ],
+    cpmk: [
+      { kode: 'CPMK1', deskripsi: 'Mahasiswa mampu memahami konsep dasar web development' },
+      { kode: 'CPMK2', deskripsi: 'Mahasiswa mampu menggunakan HTML dan CSS untuk membuat tampilan web' }
+    ],
+    materi: [
+      { kodeCPMK: 'CPMK1', judul: 'Pengenalan Web Development', bentuk: 'luring', waktu: '3x50 menit' },
+      { kodeCPMK: 'CPMK2', judul: 'HTML dan CSS Dasar', bentuk: 'luring', waktu: '6x50 menit' }
+    ],
+    metode: {
+      diskusi: true,
+      project: true,
+      roleplay: false,
+      lainnya: {
+        enabled: true,
+        value: 'Praktikum di laboratorium komputer'
+      }
+    },
+    pengalamanBelajar: 'Mahasiswa melakukan praktikum pembuatan website sederhana, diskusi kelompok tentang tren teknologi web terkini, dan presentasi project akhir.',
+    media: {
+      linkLMS: 'https://lms.unu.ac.id/course/web-programming',
+      presentaseLuring: 70,
+      presentaseDaring: 30
+    },
+    penilaian: [
+      { basisEvaluasi: 'aktivitas', komponen: 'Kehadiran dan Partisipasi', bobot: 20, cpmkTerkait: 'CPMK1', bobotCPMK: 100 },
+      { basisEvaluasi: 'project', komponen: 'Project Akhir', bobot: 40, cpmkTerkait: 'CPMK2', bobotCPMK: 100 },
+      { basisEvaluasi: 'kognitif', komponen: 'UTS', bobot: 20, cpmkTerkait: 'CPMK1', bobotCPMK: 50 },
+      { basisEvaluasi: 'kognitif', komponen: 'UAS', bobot: 20, cpmkTerkait: 'CPMK2', bobotCPMK: 50 }
+    ],
+    referensi: [
+      { judul: 'Learning Web Design', pengarang: 'Jennifer Niederst Robbins', tahun: '2018' },
+      { judul: 'JavaScript: The Good Parts', pengarang: 'Douglas Crockford', tahun: '2017' }
+    ],
+    dosen: [
+      { nama: 'Dr. Ahmad Susanto, M.Kom', gelar: 'M.Kom', peran: 'utama' },
+      { nama: 'Siti Nurhaliza, S.Kom', gelar: 'S.Kom', peran: 'team' }
+    ],
+    otorisasi: {
+      tanggal: '2024-08-15',
+      koordinatorMK: 'Dr. Ahmad Susanto, M.Kom',
+      koordinatorKeahlian: 'Prof. Dr. Budi Santoso, M.T',
+      kaprodi: 'Dr. Indra Wijaya, M.Kom'
+    }
+  }
+
+  // Populate form with loaded data
+  formData.value = { ...sampleData }
+}
+
 const saveForm = () => {
   if (!validateForm()) {
     return
   }
 
   // Here you would typically send data to the API
-  console.log('Saving RPS form data:', formData.value)
+  console.log(`${isEditMode.value ? 'Updating' : 'Saving'} RPS form data:`, formData.value)
   
-  showSuccess('Data RPS berhasil disimpan!')
+  const message = isEditMode.value ? 'Data RPS berhasil diupdate!' : 'Data RPS berhasil disimpan!'
+  showSuccess(message)
   
   // Navigate back to management page
   router.push('/manajemen-rps')
 }
 
 onMounted(() => {
-  // Initialize form with current date
-  formData.value.otorisasi.tanggal = new Date().toISOString().split('T')[0]
+  if (isEditMode.value && rpsId.value) {
+    // Load existing RPS data for editing
+    loadRPSData(rpsId.value)
+  } else {
+    // Initialize form with current date for new RPS
+    formData.value.otorisasi.tanggal = new Date().toISOString().split('T')[0]
+  }
 })
 </script>
 

@@ -35,6 +35,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
+      path: '/manajemen-rps/edit/:id',
+      name: 'edit-rps',
+      component: () => import('../views/RPSFormView.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
       path: '/manajemen-mata-kuliah',
       name: 'manajemen-mata-kuliah',
       component: () => import('../views/ManajemenMataKuliahView.vue'),

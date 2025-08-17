@@ -79,6 +79,13 @@
       />
     </template>
   </TableLayout>
+
+  <!-- RPS View Modal -->
+  <RPSViewModal 
+    :show="showViewModal" 
+    :rps-data="selectedRPS" 
+    @close="closeViewModal" 
+  />
 </template>
 
 <script setup lang="ts">
@@ -88,6 +95,7 @@ import { Plus, Search, Edit2, Eye, Trash2 } from 'lucide-vue-next'
 import TableLayout from '../components/TableLayout.vue'
 import DataTable, { type TableColumn } from '../components/DataTable.vue'
 import TablePagination from '../components/TablePagination.vue'
+import RPSViewModal from '../components/RPSViewModal.vue'
 
 const router = useRouter()
 
@@ -124,6 +132,10 @@ const rpsList = ref<RPS[]>([
 const searchQuery = ref('')
 const statusFilter = ref('')
 const semesterFilter = ref('')
+
+// Modal states
+const showViewModal = ref(false)
+const selectedRPS = ref<any>(null)
 
 // Pagination states
 const currentPage = ref(1)
@@ -198,11 +210,53 @@ const handleRowClick = (item: RPS, index: number) => {
 }
 
 const editRPS = (rps: RPS) => {
-  console.log('Edit RPS:', rps.mataKuliah)
+  router.push(`/manajemen-rps/edit/${rps.id}`)
 }
 
 const viewRPS = (rps: RPS) => {
-  console.log('View RPS:', rps.mataKuliah)
+  // Create detailed RPS data based on the selected item
+  selectedRPS.value = {
+    identitas: {
+      kodeMK: getKodeMK(rps.mataKuliah),
+      namaMK: rps.mataKuliah,
+      sksTeori: Math.floor(rps.sks * 0.6),
+      sksPraktik: Math.ceil(rps.sks * 0.4),
+      status: rps.status === 'Aktif' ? 'wajib' : 'pilihan',
+      prasyarat: getPrerequisites(rps.mataKuliah)
+    },
+    deskripsi: getDescription(rps.mataKuliah),
+    cpl: getCPL(rps.mataKuliah),
+    cpmk: getCPMK(rps.mataKuliah),
+    materi: getMateri(rps.mataKuliah),
+    metode: {
+      diskusi: true,
+      project: rps.mataKuliah.includes('Web') || rps.mataKuliah.includes('Software'),
+      roleplay: rps.mataKuliah.includes('Sistem'),
+      lainnya: {
+        enabled: true,
+        value: 'Praktikum di laboratorium komputer'
+      }
+    },
+    pengalamanBelajar: getPengalamanBelajar(rps.mataKuliah),
+    media: {
+      linkLMS: `https://lms.unu.ac.id/course/${rps.mataKuliah.toLowerCase().replace(/\s+/g, '-')}`,
+      presentaseLuring: 70,
+      presentaseDaring: 30
+    },
+    penilaian: getPenilaian(),
+    referensi: getReferensi(rps.mataKuliah),
+    dosen: [
+      { nama: 'Dr. Ahmad Susanto, M.Kom', gelar: 'M.Kom', peran: 'utama' },
+      { nama: 'Siti Nurhaliza, S.Kom', gelar: 'S.Kom', peran: 'team' }
+    ],
+    otorisasi: {
+      tanggal: '2024-08-15',
+      koordinatorMK: 'Dr. Ahmad Susanto, M.Kom',
+      koordinatorKeahlian: 'Prof. Dr. Budi Santoso, M.T',
+      kaprodi: 'Dr. Indra Wijaya, M.Kom'
+    }
+  }
+  showViewModal.value = true
 }
 
 const deleteRPS = (rps: RPS) => {
@@ -216,6 +270,104 @@ const deleteRPS = (rps: RPS) => {
 
 const navigateToAddRPS = () => {
   router.push('/manajemen-rps/tambah')
+}
+
+const closeViewModal = () => {
+  showViewModal.value = false
+  selectedRPS.value = null
+}
+
+// Helper functions to generate sample data based on course name
+const getKodeMK = (mataKuliah: string): string => {
+  const codes: Record<string, string> = {
+    'Pemrograman Web': 'IF301',
+    'Basis Data': 'IF201',
+    'Algoritma dan Struktur Data': 'IF101',
+    'Sistem Operasi': 'IF401',
+    'Jaringan Komputer': 'IF501',
+    'Rekayasa Perangkat Lunak': 'IF601',
+    'Kecerdasan Buatan': 'IF701',
+    'Grafika Komputer': 'IF801'
+  }
+  return codes[mataKuliah] || 'IF999'
+}
+
+const getPrerequisites = (mataKuliah: string): string => {
+  const prerequisites: Record<string, string> = {
+    'Pemrograman Web': 'Algoritma dan Pemrograman',
+    'Basis Data': 'Struktur Data',
+    'Sistem Operasi': 'Organisasi Komputer',
+    'Jaringan Komputer': 'Sistem Operasi',
+    'Rekayasa Perangkat Lunak': 'Pemrograman Berorientasi Objek',
+    'Kecerdasan Buatan': 'Algoritma dan Struktur Data',
+    'Grafika Komputer': 'Matematika Diskrit'
+  }
+  return prerequisites[mataKuliah] || ''
+}
+
+const getDescription = (mataKuliah: string): string => {
+  const descriptions: Record<string, string> = {
+    'Pemrograman Web': 'Mata kuliah ini membahas tentang pengembangan aplikasi web menggunakan teknologi modern termasuk HTML, CSS, JavaScript, dan framework web.',
+    'Basis Data': 'Mata kuliah yang membahas konsep dasar basis data, desain database, SQL, dan implementasi sistem basis data.',
+    'Algoritma dan Struktur Data': 'Mata kuliah yang mempelajari algoritma fundamental dan struktur data untuk pemecahan masalah komputasi.',
+    'Sistem Operasi': 'Mata kuliah yang membahas konsep dasar sistem operasi, manajemen proses, memori, dan file system.',
+    'Jaringan Komputer': 'Mata kuliah yang mempelajari protokol jaringan, arsitektur jaringan, dan teknologi komunikasi data.',
+    'Rekayasa Perangkat Lunak': 'Mata kuliah yang membahas metodologi pengembangan perangkat lunak dari analisis hingga maintenance.',
+    'Kecerdasan Buatan': 'Mata kuliah yang mempelajari teknik-teknik AI seperti machine learning, neural networks, dan expert systems.',
+    'Grafika Komputer': 'Mata kuliah yang membahas teknik rendering, transformasi 2D/3D, dan pemrograman grafis.'
+  }
+  return descriptions[mataKuliah] || 'Deskripsi mata kuliah belum tersedia.'
+}
+
+const getCPL = (mataKuliah: string) => {
+  return [
+    { kode: 'CPL1', deskripsi: `Mahasiswa mampu memahami konsep dasar ${mataKuliah}` },
+    { kode: 'CPL2', deskripsi: `Mahasiswa mampu menerapkan prinsip-prinsip ${mataKuliah} dalam praktik` }
+  ]
+}
+
+const getCPMK = (mataKuliah: string) => {
+  return [
+    { kode: 'CPMK1', deskripsi: `Mahasiswa mampu menganalisis teori ${mataKuliah}` },
+    { kode: 'CPMK2', deskripsi: `Mahasiswa mampu mengimplementasikan solusi ${mataKuliah}` }
+  ]
+}
+
+const getMateri = (mataKuliah: string) => {
+  return [
+    { kodeCPMK: 'CPMK1', judul: `Pengenalan ${mataKuliah}`, bentuk: 'luring', waktu: '3x50 menit' },
+    { kodeCPMK: 'CPMK2', judul: `Implementasi ${mataKuliah}`, bentuk: 'luring', waktu: '6x50 menit' }
+  ]
+}
+
+const getPengalamanBelajar = (mataKuliah: string): string => {
+  return `Mahasiswa melakukan praktikum ${mataKuliah}, diskusi kelompok tentang studi kasus, dan presentasi project akhir.`
+}
+
+const getPenilaian = () => {
+  return [
+    { basisEvaluasi: 'aktivitas', komponen: 'Kehadiran dan Partisipasi', bobot: 20, cpmkTerkait: 'CPMK1', bobotCPMK: 100 },
+    { basisEvaluasi: 'project', komponen: 'Project Akhir', bobot: 40, cpmkTerkait: 'CPMK2', bobotCPMK: 100 },
+    { basisEvaluasi: 'kognitif', komponen: 'UTS', bobot: 20, cpmkTerkait: 'CPMK1', bobotCPMK: 50 },
+    { basisEvaluasi: 'kognitif', komponen: 'UAS', bobot: 20, cpmkTerkait: 'CPMK2', bobotCPMK: 50 }
+  ]
+}
+
+const getReferensi = (mataKuliah: string) => {
+  const references: Record<string, Array<{judul: string, pengarang: string, tahun: string}>> = {
+    'Pemrograman Web': [
+      { judul: 'Learning Web Design', pengarang: 'Jennifer Niederst Robbins', tahun: '2018' },
+      { judul: 'JavaScript: The Good Parts', pengarang: 'Douglas Crockford', tahun: '2017' }
+    ],
+    'Basis Data': [
+      { judul: 'Database System Concepts', pengarang: 'Silberschatz, Korth, Sudarshan', tahun: '2019' },
+      { judul: 'Fundamentals of Database Systems', pengarang: 'Elmasri & Navathe', tahun: '2017' }
+    ]
+  }
+  return references[mataKuliah] || [
+    { judul: `Handbook of ${mataKuliah}`, pengarang: 'Various Authors', tahun: '2020' },
+    { judul: `Introduction to ${mataKuliah}`, pengarang: 'Academic Press', tahun: '2019' }
+  ]
 }
 </script>
 

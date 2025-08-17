@@ -72,7 +72,7 @@
             <GraduationCap :size="18" />
             <div>
               <span class="role">Lecturer</span>
-              <span class="email">ahmad.susanto@unu.ac.id</span>
+              <span class="email">dosen@unu.ac.id</span>
             </div>
           </button>
         </div>
@@ -128,7 +128,7 @@ const fillAdmin = () => {
 }
 
 const fillDosen = () => {
-  loginForm.value.email = 'ahmad.susanto@unu.ac.id'
+  loginForm.value.email = 'dosen@unu.ac.id'
   loginForm.value.password = 'dosen123'
 }
 </script>
