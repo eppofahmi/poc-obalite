@@ -241,37 +241,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Search, Plus } from 'lucide-vue-next'
 import StandardLayout from '../components/StandardLayout.vue'
+import { portofolioApi } from '../services/api'
+import type { Publikasi, Penelitian, Pengabdian } from '../types/api'
+import { useNotifications } from '../composables/useNotifications'
 
-interface Publikasi {
-  id: number
-  judul: string
-  jurnal: string
-  tahun: number
-  penulis: string
-  status: string
-}
-
-interface Penelitian {
-  id: number
-  judul: string
-  jenis: string
-  tahunMulai: number
-  tahunSelesai?: number
-  sumberDana: string
-  status: string
-}
-
-interface Pengabdian {
-  id: number
-  judul: string
-  lokasi: string
-  tahun: number
-  jumlahPeserta: number
-  status: string
-}
+// Data refs
+const publikasiList = ref<Publikasi[]>([])
+const penelitianList = ref<Penelitian[]>([])
+const pengabdianList = ref<Pengabdian[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
+const { showSuccess, showError } = useNotifications()
 
 // Filter states
 const searchQuery = ref('')
@@ -283,63 +266,34 @@ const showPublikasiModal = ref(false)
 const showPenelitianModal = ref(false)
 const showPengabdianModal = ref(false)
 
-const publikasiList = ref<Publikasi[]>([
-  {
-    id: 1,
-    judul: 'Machine Learning Approaches for Educational Data Mining',
-    jurnal: 'International Journal of Educational Technology',
-    tahun: 2024,
-    penulis: 'Dr. John Doe, Jane Smith',
-    status: 'Published'
-  },
-  {
-    id: 2,
-    judul: 'Web-based Learning Management System Design',
-    jurnal: 'Journal of Computer Science Education',
-    tahun: 2023,
-    penulis: 'Dr. John Doe',
-    status: 'Published'
+// API methods
+const fetchPortofolioData = async () => {
+  loading.value = true
+  error.value = null
+  
+  try {
+    const [publikasiResponse, penelitianResponse, pengabdianResponse] = await Promise.all([
+      portofolioApi.getPublikasi(),
+      portofolioApi.getPenelitian(),
+      portofolioApi.getPengabdian()
+    ])
+    
+    publikasiList.value = publikasiResponse.data
+    penelitianList.value = penelitianResponse.data
+    pengabdianList.value = pengabdianResponse.data
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to fetch portofolio data'
+    showError(err instanceof Error ? err.message : 'Gagal memuat data portofolio')
+    console.error('Fetch portofolio error:', err)
+  } finally {
+    loading.value = false
   }
-])
+}
 
-const penelitianList = ref<Penelitian[]>([
-  {
-    id: 1,
-    judul: 'Pengembangan Sistem Pembelajaran Adaptif Berbasis AI',
-    jenis: 'Terapan',
-    tahunMulai: 2024,
-    sumberDana: 'Kemenristekdikti',
-    status: 'Berjalan'
-  },
-  {
-    id: 2,
-    judul: 'Analisis Performa Database NoSQL untuk Big Data',
-    jenis: 'Fundamental',
-    tahunMulai: 2023,
-    tahunSelesai: 2024,
-    sumberDana: 'Internal Universitas',
-    status: 'Selesai'
-  }
-])
-
-const pengabdianList = ref<Pengabdian[]>([
-  {
-    id: 1,
-    judul: 'Pelatihan Web Development untuk UMKM',
-    lokasi: 'Bandung, Jawa Barat',
-    tahun: 2024,
-    jumlahPeserta: 50,
-    status: 'Selesai'
-  },
-  {
-    id: 2,
-    judul: 'Workshop Digital Marketing untuk Guru',
-    lokasi: 'Jakarta',
-    tahun: 2023,
-    jumlahPeserta: 75,
-    status: 'Selesai'
-  }
-])
+// Initialize data
+onMounted(() => {
+  fetchPortofolioData()
+})
 
 const newPublikasi = ref({
   judul: '',

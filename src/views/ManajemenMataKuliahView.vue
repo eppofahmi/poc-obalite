@@ -137,6 +137,7 @@ import DataTable, { type TableColumn } from '../components/DataTable.vue'
 import TablePagination from '../components/TablePagination.vue'
 import { mataKuliahApi } from '../services/api'
 import type { MataKuliah, CreateMataKuliahRequest, FilterParams } from '../types/api'
+import { useNotifications } from '../composables/useNotifications'
 
 // Table columns definition
 const columns: TableColumn[] = [
@@ -154,6 +155,7 @@ const showModal = ref(false)
 const mataKuliahList = ref<MataKuliah[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+const { showSuccess, showError } = useNotifications()
 
 const newMatkul = ref<CreateMataKuliahRequest>({
   nama: '',
@@ -196,6 +198,7 @@ const fetchMataKuliah = async () => {
     mataKuliahList.value = response.data
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to fetch mata kuliah'
+    showError(err instanceof Error ? err.message : 'Gagal memuat data mata kuliah')
     console.error('Fetch mata kuliah error:', err)
   } finally {
     loading.value = false
@@ -268,8 +271,10 @@ const deleteMataKuliah = async (matkul: MataKuliah) => {
       if (index !== -1) {
         mataKuliahList.value.splice(index, 1)
       }
+      showSuccess(`Mata kuliah ${matkul.nama} berhasil dihapus`)
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to delete mata kuliah'
+      showError(err instanceof Error ? err.message : 'Gagal menghapus mata kuliah')
       console.error('Delete mata kuliah error:', err)
     }
   }
@@ -283,8 +288,10 @@ const addMataKuliah = async () => {
     // Reset form
     newMatkul.value = { nama: '', kode: '', sks: 1, semester: '', deskripsi: '' }
     showModal.value = false
+    showSuccess(`Mata kuliah ${response.data.nama} berhasil ditambahkan`)
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to create mata kuliah'
+    showError(err instanceof Error ? err.message : 'Gagal menambahkan mata kuliah')
     console.error('Create mata kuliah error:', err)
   }
 }

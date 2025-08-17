@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import { useUserStore } from './stores/user'
 import AppHeader from './components/AppHeader.vue'
 import AppSidebar from './components/AppSidebar.vue'
+import NotificationToast from './components/NotificationToast.vue'
 
 const userStore = useUserStore()
+
+// Initialize auth state from localStorage
+onMounted(() => {
+  userStore.initializeAuth()
+})
 </script>
 
 <template>
@@ -19,6 +26,9 @@ const userStore = useUserStore()
     <template v-else>
       <RouterView />
     </template>
+    
+    <!-- Global Notification System -->
+    <NotificationToast />
   </div>
 </template>
 

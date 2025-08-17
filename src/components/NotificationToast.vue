@@ -21,39 +21,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { CheckCircle, AlertCircle, Info, X } from 'lucide-vue-next'
+import { useNotifications } from '../composables/useNotifications'
 
-interface Notification {
-  id: string
-  message: string
-  type: 'success' | 'error' | 'info'
-  duration?: number
-}
-
-const notifications = ref<Notification[]>()
-
-const addNotification = (message: string, type: 'success' | 'error' | 'info' = 'info', duration = 4000) => {
-  const id = Date.now().toString()
-  const notification: Notification = { id, message, type, duration }
-  
-  notifications.value.push(notification)
-  
-  if (duration > 0) {
-    setTimeout(() => {
-      removeNotification(id)
-    }, duration)
-  }
-  
-  return id
-}
-
-const removeNotification = (id: string) => {
-  const index = notifications.value.findIndex(n => n.id === id)
-  if (index > -1) {
-    notifications.value.splice(index, 1)
-  }
-}
+const { notifications, removeNotification } = useNotifications()
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -62,12 +33,6 @@ const getIcon = (type: string) => {
     default: return Info
   }
 }
-
-// Expose methods for external use
-defineExpose({
-  addNotification,
-  removeNotification
-})
 </script>
 
 <style scoped>

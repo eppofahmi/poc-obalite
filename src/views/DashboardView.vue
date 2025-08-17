@@ -352,12 +352,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
 import { dashboardApi } from '../services/api'
 import type { DashboardStats } from '../types/api'
+import { useNotifications } from '../composables/useNotifications'
 import { 
   GraduationCap, Users, FileText, CheckCircle, Book, ListChecks, FileImage,
   Upload, Printer, Calendar, Plus, FileBarChart, Edit, HelpCircle, RotateCcw
 } from 'lucide-vue-next'
 
 const userStore = useUserStore()
+const { showError } = useNotifications()
 
 // Filter states
 const selectedPeriod = ref('current')
@@ -396,6 +398,7 @@ const fetchDashboardData = async () => {
     dashboardData.value = response.data
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to fetch dashboard data'
+    showError(err instanceof Error ? err.message : 'Gagal memuat data dashboard')
     console.error('Dashboard data fetch error:', err)
   } finally {
     loading.value = false

@@ -64,7 +64,7 @@
             <ShieldCheck :size="18" />
             <div>
               <span class="role">Administrator</span>
-              <span class="email">admin@example.com</span>
+              <span class="email">admin@unu.ac.id</span>
             </div>
           </button>
           
@@ -72,7 +72,7 @@
             <GraduationCap :size="18" />
             <div>
               <span class="role">Lecturer</span>
-              <span class="email">dosen@example.com</span>
+              <span class="email">ahmad.susanto@unu.ac.id</span>
             </div>
           </button>
         </div>
@@ -85,10 +85,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
+import { useNotifications } from '../composables/useNotifications'
 import { Mail, Lock, AlertCircle, ShieldCheck, GraduationCap } from 'lucide-vue-next'
 
 const router = useRouter()
 const userStore = useUserStore()
+const { showSuccess, showError } = useNotifications()
 
 const loginForm = ref({
   email: '',
@@ -106,24 +108,27 @@ const handleLogin = async () => {
     const success = await userStore.login(loginForm.value.email, loginForm.value.password)
     
     if (success) {
+      showSuccess('Login berhasil! Selamat datang di OBA System')
       router.push('/dashboard')
     } else {
       error.value = 'Invalid email or password'
+      showError('Email atau password tidak valid')
     }
   } catch (err) {
     error.value = 'An error occurred during login'
+    showError('Terjadi kesalahan saat login')
   } finally {
     isLoading.value = false
   }
 }
 
 const fillAdmin = () => {
-  loginForm.value.email = 'admin@example.com'
+  loginForm.value.email = 'admin@unu.ac.id'
   loginForm.value.password = 'admin123'
 }
 
 const fillDosen = () => {
-  loginForm.value.email = 'dosen@example.com'
+  loginForm.value.email = 'ahmad.susanto@unu.ac.id'
   loginForm.value.password = 'dosen123'
 }
 </script>

@@ -34,10 +34,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
+import { useNotifications } from '../composables/useNotifications'
 import { User, ChevronDown, UserCog, Settings, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const userStore = useUserStore()
+const { showSuccess } = useNotifications()
 
 const getRoleLabel = (role?: string) => {
   switch (role) {
@@ -50,9 +52,16 @@ const getRoleLabel = (role?: string) => {
   }
 }
 
-const handleLogout = () => {
-  userStore.logout()
-  router.push('/login')
+const handleLogout = async () => {
+  try {
+    await userStore.logout()
+    showSuccess('Logout berhasil')
+    router.push('/login')
+  } catch (error) {
+    console.error('Logout error:', error)
+    // Force logout even if API fails
+    router.push('/login')
+  }
 }
 </script>
 
