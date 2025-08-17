@@ -4,17 +4,17 @@
   "description": "Outcome-Based Assessment System for Universitas Nahdlatul Ulama Yogyakarta",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/unufav.png",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "/favicon.png",
+      "src": "/unufav.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/apple-touch-icon.png",
+      "src": "/unufav.png",
       "sizes": "180x180",
       "type": "image/png"
     }
