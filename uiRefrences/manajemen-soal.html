@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Soal - OBA System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/LOGO_UNU_YOGYAKARTA.png/500px-LOGO_UNU_YOGYAKARTA.png" alt="UNU Yogyakarta" class="logo">
+                <div class="brand-text">
+                    <h1>OBA System</h1>
+                    <p>Outcome-Based Assessment</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <span class="user-role">Lecturer</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-btn">
+                        <span>Dr. Zulfatun Ruscitasari</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#profile"><i class="fas fa-user-cog"></i> Profile</a>
+                        <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-content">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#manajemen-mata-kuliah" class="nav-link">
+                        <i class="fas fa-book"></i>
+                        <span>Manajemen Mata Kuliah</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="#manajemen-soal" class="nav-link">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Manajemen Soal</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#portofolio" class="nav-link">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Portofolio</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <span>Manajemen Soal</span>
+        </div>
+
+        <!-- Course Selection -->
+        <div class="course-selector">
+            <label for="courseSelect">Pilih Mata Kuliah:</label>
+            <select id="courseSelect" class="course-select">
+                <option value="">Pilih mata kuliah...</option>
+                <option value="akt2201" selected>AKT2201 - Akuntansi Sektor Publik</option>
+                <option value="mng3201">MNG3201 - Manajemen Strategis</option>
+                <option value="eko1101">EKO1101 - Mikroekonomi</option>
+            </select>
+        </div>
+
+        <!-- Assessment Type Tabs -->
+        <div class="assessment-tabs">
+            <button class="tab-btn active" data-tab="quiz">
+                <i class="fas fa-clipboard-question"></i>
+                <span>Quiz (25%)</span>
+            </button>
+            <button class="tab-btn" data-tab="uts">
+                <i class="fas fa-file-alt"></i>
+                <span>UTS (30%)</span>
+            </button>
+            <button class="tab-btn" data-tab="uas">
+                <i class="fas fa-graduation-cap"></i>
+                <span>UAS (45%)</span>
+            </button>
+            <button class="tab-btn" data-tab="tugas">
+                <i class="fas fa-tasks"></i>
+                <span>Tugas/Praktek (70%)</span>
+            </button>
+            <button class="tab-btn" data-tab="keaktifan">
+                <i class="fas fa-hand-paper"></i>
+                <span>Keaktifan (30%)</span>
+            </button>
+        </div>
+
+        <!-- Tab Content Container -->
+        <div class="tab-content">
+            <!-- Quiz Tab -->
+            <div class="tab-panel active" id="quiz-panel">
+                <div class="panel-header">
+                    <div class="panel-info">
+                        <h2>Quiz - Bobot 25%</h2>
+                        <p>Kelola soal quiz dan input nilai mahasiswa</p>
+                    </div>
+                    <button class="btn-primary" id="addQuizBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Tambah Soal Quiz</span>
+                    </button>
+                </div>
+
+                <!-- Questions List -->
+                <div class="questions-section">
+                    <div class="section-title">
+                        <h3>Daftar Soal</h3>
+                        <span class="question-count">3 soal</span>
+                    </div>
+
+                    <div class="question-list">
+                        <div class="question-item">
+                            <div class="question-header">
+                                <div class="question-info">
+                                    <span class="question-number">Soal 1</span>
+                                    <div class="question-details">
+                                        <h4>Jelaskan perbedaan akuntansi sektor publik dan sektor swasta</h4>
+                                        <div class="question-meta">
+                                            <span class="cpmk-badge">CPMK 1</span>
+                                            <span class="weight-badge">Bobot: 30%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="question-actions">
+                                    <button class="btn-icon btn-edit" title="Edit Soal">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon btn-grade" title="Input Nilai">
+                                        <i class="fas fa-calculator"></i>
+                                    </button>
+                                    <button class="btn-icon btn-delete" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grading-status">
+                                <div class="grading-progress">
+                                    <span>Progress Penilaian: 25/30 mahasiswa</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 83%"></div>
+                                    </div>
+                                </div>
+                                <span class="grading-percentage">83%</span>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <div class="question-header">
+                                <div class="question-info">
+                                    <span class="question-number">Soal 2</span>
+                                    <div class="question-details">
+                                        <h4>Analisis karakteristik organisasi sektor publik</h4>
+                                        <div class="question-meta">
+                                            <span class="cpmk-badge">CPMK 2</span>
+                                            <span class="weight-badge">Bobot: 40%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="question-actions">
+                                    <button class="btn-icon btn-edit" title="Edit Soal">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon btn-grade" title="Input Nilai">
+                                        <i class="fas fa-calculator"></i>
+                                    </button>
+                                    <button class="btn-icon btn-delete" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grading-status">
+                                <div class="grading-progress">
+                                    <span>Progress Penilaian: 18/30 mahasiswa</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <span class="grading-percentage">60%</span>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <div class="question-header">
+                                <div class="question-info">
+                                    <span class="question-number">Soal 3</span>
+                                    <div class="question-details">
+                                        <h4>Evaluasi penerapan Good Public Governance</h4>
+                                        <div class="question-meta">
+                                            <span class="cpmk-badge">CPMK 3</span>
+                                            <span class="weight-badge">Bobot: 30%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="question-actions">
+                                    <button class="btn-icon btn-edit" title="Edit Soal">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon btn-grade" title="Input Nilai">
+                                        <i class="fas fa-calculator"></i>
+                                    </button>
+                                    <button class="btn-icon btn-delete" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grading-status">
+                                <div class="grading-progress">
+                                    <span>Progress Penilaian: 30/30 mahasiswa</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                <span class="grading-percentage">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assessment Summary -->
+                <div class="assessment-summary">
+                    <h3>Ringkasan Quiz</h3>
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Soal</span>
+                            <span class="stat-value">3</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Bobot</span>
+                            <span class="stat-value">100%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Progress Penilaian</span>
+                            <span class="stat-value">81%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Rata-rata Nilai</span>
+                            <span class="stat-value">78.5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other tabs would have similar structure -->
+            <div class="tab-panel" id="uts-panel">
+                <div class="panel-header">
+                    <div class="panel-info">
+                        <h2>UTS - Bobot 30%</h2>
+                        <p>Kelola soal UTS dan input nilai mahasiswa</p>
+                    </div>
+                    <button class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Tambah Soal UTS</span>
+                    </button>
+                </div>
+
+                <div class="empty-state">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>Belum ada soal UTS</h3>
+                    <p>Mulai buat soal UTS untuk mata kuliah ini</p>
+                    <button class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Buat Soal UTS</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Similar structure for other tabs -->
+        </div>
+    </main>
+
+    <!-- Question Creation Modal -->
+    <div class="modal" id="questionModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="questionModalTitle">Tambah Soal Quiz</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="questionForm" class="question-form">
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="questionText">Soal *</label>
+                            <textarea id="questionText" name="questionText" rows="4" required
+                                      placeholder="Masukkan teks soal..."></textarea>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="cpmkSelect">CPMK Terkait *</label>
+                                <select id="cpmkSelect" name="cpmk" required>
+                                    <option value="">Pilih CPMK...</option>
+                                    <option value="cpmk1">CPMK 1 - Memahami konsep dasar</option>
+                                    <option value="cpmk2">CPMK 2 - Menganalisis perbedaan</option>
+                                    <option value="cpmk3">CPMK 3 - Mengevaluasi penerapan</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="questionWeight">Bobot Soal (%) *</label>
+                                <input type="number" id="questionWeight" name="weight" 
+                                       min="1" max="100" required placeholder="contoh: 30">
+                                <small>Sisa bobot yang tersedia: 100%</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="questionType">Tipe Soal</label>
+                            <select id="questionType" name="type">
+                                <option value="essay">Essay</option>
+                                <option value="multiple-choice">Pilihan Ganda</option>
+                                <option value="short-answer">Jawaban Singkat</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rubric">Rubrik Penilaian</label>
+                            <textarea id="rubric" name="rubric" rows="3"
+                                      placeholder="Masukkan kriteria penilaian (opsional)"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="questionCancel">Batal</button>
+                <button class="btn-primary" id="questionSave">Simpan Soal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grading Modal -->
+    <div class="modal" id="gradingModal">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <h3 id="gradingModalTitle">Input Nilai - Soal 1</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="grading-info">
+                    <div class="question-preview">
+                        <h4>Soal:</h4>
+                        <p>Jelaskan perbedaan akuntansi sektor publik dan sektor swasta</p>
+                        <div class="question-meta">
+                            <span class="cpmk-badge">CPMK 1</span>
+                            <span class="weight-badge">Bobot: 30% (Maksimal: 30 poin)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grading-table-container">
+                    <table class="grading-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIM</th>
+                                <th>Nama Mahasiswa</th>
+                                <th>Nilai (0-30)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>2023001</td>
+                                <td>Ahmad Fauzi</td>
+                                <td><input type="number" min="0" max="30" value="25" class="grade-input"></td>
+                                <td><span class="status-badge active">Dinilai</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>2023002</td>
+                                <td>Siti Aisyah</td>
+                                <td><input type="number" min="0" max="30" value="28" class="grade-input"></td>
+                                <td><span class="status-badge active">Dinilai</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>2023003</td>
+                                <td>Muhammad Rizki</td>
+                                <td><input type="number" min="0" max="30" placeholder="Belum dinilai" class="grade-input"></td>
+                                <td><span class="status-badge draft">Belum dinilai</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grading-summary">
+                    <div class="summary-item">
+                        <span>Total Mahasiswa:</span>
+                        <span>30</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Sudah Dinilai:</span>
+                        <span>25</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Rata-rata Nilai:</span>
+                        <span>26.5 (88.3%)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="gradingCancel">Batal</button>
+                <button class="btn-primary" id="gradingSave">Simpan Nilai</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all tabs and panels
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding panel
+                btn.classList.add('active');
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId + '-panel').classList.add('active');
+            });
+        });
+
+        // Modal handling
+        document.getElementById('addQuizBtn')?.addEventListener('click', () => {
+            document.getElementById('questionModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        document.querySelectorAll('.btn-grade').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('gradingModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // Close modals
+        document.querySelectorAll('.modal-close, #questionCancel, #gradingCancel').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // Grade input validation
+        document.querySelectorAll('.grade-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const max = parseInt(this.getAttribute('max'));
+                const value = parseInt(this.value);
+                
+                if (value > max) {
+                    this.value = max;
+                    if (window.obaSystem) {
+                        window.obaSystem.showNotification(`Nilai tidak boleh melebihi ${max}`, 'warning');
+                    }
+                }
+            });
+        });
+
+        // Course selection
+        document.getElementById('courseSelect')?.addEventListener('change', function() {
+            if (this.value) {
+                // Reload questions for selected course
+                console.log('Loading questions for:', this.value);
+            }
+        });
+    </script>
+</body>
+</html>

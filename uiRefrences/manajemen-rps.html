@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen RPS - OBA System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/LOGO_UNU_YOGYAKARTA.png/500px-LOGO_UNU_YOGYAKARTA.png" alt="UNU Yogyakarta" class="logo">
+                <div class="brand-text">
+                    <h1>OBA System</h1>
+                    <p>Outcome-Based Assessment</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <span class="user-role">Academic Admin</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-btn">
+                        <span>Dr. Admin</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#profile"><i class="fas fa-user-cog"></i> Profile</a>
+                        <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-content">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="#manajemen-rps" class="nav-link">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Manajemen RPS</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <span>Manajemen RPS</span>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Manajemen RPS</h1>
+                <p>Kelola Rencana Pembelajaran Semester untuk semua mata kuliah</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn-primary" id="addRpsBtn">
+                    <i class="fas fa-plus"></i>
+                    <span>Tambah RPS</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter and Search -->
+        <div class="table-controls">
+            <div class="search-filters">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Cari mata kuliah..." id="searchInput">
+                </div>
+                <select class="filter-select" id="semesterFilter">
+                    <option value="">Semua Semester</option>
+                    <option value="ganjil">Semester Ganjil</option>
+                    <option value="genap">Semester Genap</option>
+                </select>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">Semua Status</option>
+                    <option value="draft">Draft</option>
+                    <option value="active">Aktif</option>
+                    <option value="archived">Arsip</option>
+                </select>
+            </div>
+            <div class="table-actions">
+                <button class="btn-secondary" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    <span>Export</span>
+                </button>
+                <button class="btn-secondary" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- RPS Table -->
+        <div class="table-container">
+            <table class="data-table" id="rpsTable">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll">
+                        </th>
+                        <th>Kode MK</th>
+                        <th>Nama Mata Kuliah</th>
+                        <th>SKS</th>
+                        <th>Semester</th>
+                        <th>Dosen Pengampu</th>
+                        <th>Status</th>
+                        <th>Terakhir Diubah</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="row-select"></td>
+                        <td><span class="course-code">AKT2201</span></td>
+                        <td>
+                            <div class="course-title">
+                                <h4>Akuntansi Sektor Publik</h4>
+                                <p>3 CPMK • 16 Minggu</p>
+                            </div>
+                        </td>
+                        <td>3</td>
+                        <td><span class="semester-badge genap">Genap</span></td>
+                        <td>
+                            <div class="lecturer-info">
+                                <span>Dr. Zulfatun Ruscitasari, S.E., M.Acc.</span>
+                            </div>
+                        </td>
+                        <td><span class="status-badge active">Aktif</span></td>
+                        <td>
+                            <div class="date-info">
+                                <span>15 Mar 2024</span>
+                                <small>10:30 AM</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" title="Lihat">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-copy" title="Duplikat">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="row-select"></td>
+                        <td><span class="course-code">MNG3201</span></td>
+                        <td>
+                            <div class="course-title">
+                                <h4>Manajemen Strategis</h4>
+                                <p>3 CPMK • 16 Minggu</p>
+                            </div>
+                        </td>
+                        <td>3</td>
+                        <td><span class="semester-badge genap">Genap</span></td>
+                        <td>
+                            <div class="lecturer-info">
+                                <span>Dr. Ahmad Suryadi, M.M.</span>
+                            </div>
+                        </td>
+                        <td><span class="status-badge draft">Draft</span></td>
+                        <td>
+                            <div class="date-info">
+                                <span>12 Mar 2024</span>
+                                <small>02:15 PM</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" title="Lihat">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-copy" title="Duplikat">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="row-select"></td>
+                        <td><span class="course-code">EKO1101</span></td>
+                        <td>
+                            <div class="course-title">
+                                <h4>Mikroekonomi</h4>
+                                <p>2 CPMK • 16 Minggu</p>
+                            </div>
+                        </td>
+                        <td>3</td>
+                        <td><span class="semester-badge ganjil">Ganjil</span></td>
+                        <td>
+                            <div class="lecturer-info">
+                                <span>Dr. Siti Nurjanah, S.E., M.Si.</span>
+                            </div>
+                        </td>
+                        <td><span class="status-badge active">Aktif</span></td>
+                        <td>
+                            <div class="date-info">
+                                <span>08 Mar 2024</span>
+                                <small>09:45 AM</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" title="Lihat">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-copy" title="Duplikat">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="row-select"></td>
+                        <td><span class="course-code">HIS2101</span></td>
+                        <td>
+                            <div class="course-title">
+                                <h4>Sejarah Peradaban Islam</h4>
+                                <p>3 CPMK • 16 Minggu</p>
+                            </div>
+                        </td>
+                        <td>2</td>
+                        <td><span class="semester-badge ganjil">Ganjil</span></td>
+                        <td>
+                            <div class="lecturer-info">
+                                <span>Dr. Muhammad Fauzi, M.A.</span>
+                            </div>
+                        </td>
+                        <td><span class="status-badge archived">Arsip</span></td>
+                        <td>
+                            <div class="date-info">
+                                <span>01 Mar 2024</span>
+                                <small>04:20 PM</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" title="Lihat">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-copy" title="Duplikat">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="row-select"></td>
+                        <td><span class="course-code">MAN2202</span></td>
+                        <td>
+                            <div class="course-title">
+                                <h4>Manajemen Keuangan</h4>
+                                <p>4 CPMK • 16 Minggu</p>
+                            </div>
+                        </td>
+                        <td>3</td>
+                        <td><span class="semester-badge genap">Genap</span></td>
+                        <td>
+                            <div class="lecturer-info">
+                                <span>Dr. Rina Wijayanti, M.M.</span>
+                            </div>
+                        </td>
+                        <td><span class="status-badge active">Aktif</span></td>
+                        <td>
+                            <div class="date-info">
+                                <span>20 Feb 2024</span>
+                                <small>11:10 AM</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon btn-view" title="Lihat">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-copy" title="Duplikat">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Menampilkan <strong>1-5</strong> dari <strong>23</strong> RPS
+            </div>
+            <div class="pagination">
+                <button class="pagination-btn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <span class="pagination-dots">...</span>
+                <button class="pagination-btn">5</button>
+                <button class="pagination-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Bulk Actions Bar (Hidden by default) -->
+        <div class="bulk-actions-bar" id="bulkActionsBar" style="display: none;">
+            <div class="bulk-info">
+                <span id="selectedCount">0</span> item dipilih
+            </div>
+            <div class="bulk-buttons">
+                <button class="btn-secondary" id="bulkExport">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+                <button class="btn-secondary" id="bulkArchive">
+                    <i class="fas fa-archive"></i>
+                    Arsipkan
+                </button>
+                <button class="btn-danger" id="bulkDelete">
+                    <i class="fas fa-trash"></i>
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- RPS Form Modal -->
+    <div class="modal" id="rpsModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="rpsModalTitle">Tambah RPS Baru</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="rpsForm" class="rps-form">
+                    <!-- Basic Course Information -->
+                    <div class="form-section">
+                        <h4>Informasi Mata Kuliah</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="courseCode">Kode Mata Kuliah *</label>
+                                <input type="text" id="courseCode" name="courseCode" required 
+                                       placeholder="contoh: AKT2201">
+                            </div>
+                            <div class="form-group">
+                                <label for="courseName">Nama Mata Kuliah *</label>
+                                <input type="text" id="courseName" name="courseName" required
+                                       placeholder="contoh: Akuntansi Sektor Publik">
+                            </div>
+                            <div class="form-group">
+                                <label for="credits">SKS *</label>
+                                <select id="credits" name="credits" required>
+                                    <option value="">Pilih SKS</option>
+                                    <option value="1">1 SKS</option>
+                                    <option value="2">2 SKS</option>
+                                    <option value="3">3 SKS</option>
+                                    <option value="4">4 SKS</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="semester">Semester *</label>
+                                <select id="semester" name="semester" required>
+                                    <option value="">Pilih Semester</option>
+                                    <option value="ganjil">Ganjil</option>
+                                    <option value="genap">Genap</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="lecturer">Dosen Pengampu *</label>
+                                <select id="lecturer" name="lecturer" required>
+                                    <option value="">Pilih Dosen</option>
+                                    <option value="zulfatun">Dr. Zulfatun Ruscitasari, S.E., M.Acc.</option>
+                                    <option value="ahmad">Dr. Ahmad Suryadi, M.M.</option>
+                                    <option value="siti">Dr. Siti Nurjanah, S.E., M.Si.</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="prerequisites">Mata Kuliah Prasyarat</label>
+                                <input type="text" id="prerequisites" name="prerequisites"
+                                       placeholder="contoh: Pengantar Akuntansi">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Description -->
+                    <div class="form-section">
+                        <h4>Deskripsi Mata Kuliah</h4>
+                        <div class="form-group">
+                            <textarea id="courseDescription" name="courseDescription" rows="4"
+                                      placeholder="Masukkan deskripsi singkat mata kuliah..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Learning Outcomes (CPL) -->
+                    <div class="form-section">
+                        <h4>Capaian Pembelajaran Lulusan (CPL)</h4>
+                        <div class="cpl-list" id="cplList">
+                            <div class="cpl-item">
+                                <input type="checkbox" id="cpl1" name="cpl[]" value="cpl1">
+                                <label for="cpl1">
+                                    <strong>CPL1:</strong> Menginternalisasi nilai, norma, dan etika akademik
+                                </label>
+                            </div>
+                            <div class="cpl-item">
+                                <input type="checkbox" id="cpl2" name="cpl[]" value="cpl2">
+                                <label for="cpl2">
+                                    <strong>CPL2:</strong> Mampu menunjukkan kinerja mandiri, bermutu dan terukur
+                                </label>
+                            </div>
+                            <div class="cpl-item">
+                                <input type="checkbox" id="cpl3" name="cpl[]" value="cpl3">
+                                <label for="cpl3">
+                                    <strong>CPL3:</strong> Mampu memanfaatkan ilmu pengetahuan dan teknologi
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Learning Outcomes (CPMK) -->
+                    <div class="form-section">
+                        <h4>Capaian Pembelajaran Mata Kuliah (CPMK)</h4>
+                        <div class="cpmk-container" id="cpmkContainer">
+                            <div class="cpmk-item">
+                                <div class="cpmk-header">
+                                    <label>CPMK 1</label>
+                                    <button type="button" class="btn-icon btn-remove-cpmk" title="Hapus CPMK">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <textarea name="cpmk[]" placeholder="Masukkan deskripsi CPMK 1..." rows="2"></textarea>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-secondary btn-add-cpmk" id="addCpmkBtn">
+                            <i class="fas fa-plus"></i>
+                            Tambah CPMK
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="rpsCancel">Batal</button>
+                <button class="btn-primary" id="rpsSave">Simpan RPS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Konfirmasi</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Apakah Anda yakin?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="confirmCancel">Batal</button>
+                <button class="btn-danger" id="confirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="manajemen-rps.js"></script>
+</body>
+</html>
