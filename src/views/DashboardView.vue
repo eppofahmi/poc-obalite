@@ -1,9 +1,40 @@
 <template>
-  <div class="dashboard">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-      <span>{{ userStore.user?.role === 'admin' ? 'Dashboard' : 'Lecturer Dashboard' }}</span>
+  <div class="dashboard-layout">
+    <!-- Fixed Header with Dashboard Title and Filters -->
+    <div class="dashboard-header">
+      <div class="header-title">
+        <h1>{{ userStore.user?.role === 'admin' ? 'Dashboard' : 'Lecturer Dashboard' }}</h1>
+      </div>
+      
+      <div class="header-filters">
+        <select v-model="selectedPeriod" class="filter-select">
+          <option value="current">Current Semester</option>
+          <option value="ganjil2024">Ganjil 2024/2025</option>
+          <option value="genap2024">Genap 2024/2025</option>
+        </select>
+        
+        <select v-if="userStore.user?.role === 'admin'" v-model="selectedFaculty" class="filter-select">
+          <option value="all">All Faculties</option>
+          <option value="ekonomi">Fakultas Ekonomi</option>
+          <option value="hukum">Fakultas Hukum</option>
+          <option value="teknik">Fakultas Teknik</option>
+        </select>
+        
+        <select v-if="userStore.user?.role === 'dosen'" v-model="selectedCourse" class="filter-select">
+          <option value="all">All Courses</option>
+          <option value="akt2201">AKT2201</option>
+          <option value="mng3201">MNG3201</option>
+          <option value="eko1101">EKO1101</option>
+        </select>
+        
+        <button class="refresh-btn" @click="refreshData" title="Refresh Data">
+          <RotateCcw :size="18" />
+        </button>
+      </div>
     </div>
+
+    <!-- Scrollable Content -->
+    <div class="dashboard-content">
 
     <!-- Statistics Cards -->
     <div class="stats-grid">
@@ -284,7 +315,9 @@
         </div>
       </div>
     </div>
-  </div>
+    
+    </div> <!-- End dashboard-content -->
+  </div> <!-- End dashboard-layout -->
 </template>
 
 <script setup lang="ts">
@@ -292,10 +325,21 @@ import { ref } from 'vue'
 import { useUserStore } from '../stores/user'
 import { 
   GraduationCap, Users, FileText, CheckCircle, Book, ListChecks, FileImage,
-  Upload, Printer, Calendar, Plus, FileBarChart, Edit, HelpCircle
+  Upload, Printer, Calendar, Plus, FileBarChart, Edit, HelpCircle, RotateCcw
 } from 'lucide-vue-next'
 
 const userStore = useUserStore()
+
+// Filter states
+const selectedPeriod = ref('current')
+const selectedFaculty = ref('all')
+const selectedCourse = ref('all')
+
+// Methods
+const refreshData = () => {
+  console.log('Refreshing dashboard data...')
+  // Implement refresh logic here
+}
 
 const lecturerCourses = ref([
   { id: 1, code: 'AKT2201', name: 'Akuntansi Sektor Publik', students: 30, class: 'Kelas A', progress: 85 },
@@ -325,15 +369,80 @@ const assessmentOverview = ref([
 </script>
 
 <style scoped>
-.dashboard {
-  padding: 2rem;
+/* Dashboard Layout */
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 70px);
+  background-color: var(--oba-background);
+  overflow: hidden;
 }
 
-.breadcrumb {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 2rem;
+/* Fixed Header */
+.dashboard-header {
+  background: var(--oba-background);
+  padding: 24px 32px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-filters {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--oba-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--oba-white);
+  color: var(--oba-text);
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--oba-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--oba-border);
+  background: var(--oba-white);
+  color: var(--oba-text-light);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+  border-color: var(--oba-primary);
+  color: var(--oba-primary);
+  background: rgba(30, 64, 175, 0.05);
+}
+
+.header-title h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--oba-text);
+  margin: 0;
+}
+
+/* Scrollable Content */
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
 }
 
 /* Statistics Grid */
@@ -341,14 +450,15 @@ const assessmentOverview = ref([
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .stat-card {
-  background-color: #ffffff;
+  background-color: var(--oba-white);
   padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--oba-border);
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -379,13 +489,13 @@ const assessmentOverview = ref([
 .stat-content h3 {
   font-size: 2rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--oba-text);
   margin: 0;
 }
 
 .stat-content p {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--oba-text-light);
   margin: 0;
 }
 
@@ -398,15 +508,16 @@ const assessmentOverview = ref([
 
 /* Cards */
 .card {
-  background-color: #ffffff;
+  background-color: var(--oba-white);
   border-radius: 1rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--oba-border);
   overflow: hidden;
 }
 
 .card-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--oba-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -415,7 +526,7 @@ const assessmentOverview = ref([
 .card-header h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--oba-text);
   margin: 0;
 }
 
@@ -430,8 +541,8 @@ const assessmentOverview = ref([
 /* Semester Info */
 .semester-info {
   font-size: 0.875rem;
-  color: #6b7280;
-  background-color: #f3f4f6;
+  color: var(--oba-text-light);
+  background-color: var(--oba-background);
   padding: 0.25rem 0.5rem;
   border-radius: 0.5rem;
 }
@@ -447,7 +558,7 @@ const assessmentOverview = ref([
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--oba-border);
 }
 
 .course-item:last-child {
@@ -802,6 +913,44 @@ const assessmentOverview = ref([
 .status-label.warning {
   background-color: #fef3c7;
   color: #92400e;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard-header {
+    padding: 20px;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .header-title {
+    text-align: left;
+  }
+  
+  .header-filters {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  .dashboard-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-select {
+    min-width: auto;
+  }
+  
+  .refresh-btn {
+    align-self: flex-start;
+  }
 }
 
 /* Buttons */

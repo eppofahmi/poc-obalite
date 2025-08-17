@@ -24,13 +24,15 @@ const userStore = useUserStore()
 
 <style scoped>
 .app {
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f9fafb;
+  overflow: hidden;
 }
 
 .main-content {
   margin-left: 260px;
   margin-top: 70px;
-  min-height: calc(100vh - 70px);
+  height: calc(100vh - 70px);
+  overflow: hidden;
 }
 </style>

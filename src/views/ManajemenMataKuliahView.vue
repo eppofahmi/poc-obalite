@@ -1,31 +1,84 @@
 <template>
-  <div class="manajemen-mata-kuliah">
-    <h1>Manajemen Mata Kuliah</h1>
-    <p>Kelola mata kuliah yang Anda ampu di sini.</p>
-    
-    <div class="actions">
-      <button class="btn-primary" @click="showModal = true">Tambah Mata Kuliah</button>
-    </div>
+  <TableLayout 
+    title="Manajemen Mata Kuliah" 
+    subtitle="Kelola mata kuliah yang Anda ampu di sini"
+  >
+    <!-- Header Actions -->
+    <template #headerActions>
+      <button class="btn-primary" @click="showModal = true">
+        <Plus :size="18" />
+        Tambah Mata Kuliah
+      </button>
+    </template>
 
-    <div class="mata-kuliah-grid">
-      <div v-for="matkul in mataKuliahList" :key="matkul.id" class="mata-kuliah-card">
-        <div class="card-header">
-          <h3>{{ matkul.nama }}</h3>
-          <span :class="['status', matkul.status.toLowerCase()]">{{ matkul.status }}</span>
+    <!-- Filters -->
+    <template #filters>
+      <div class="filter-group">
+        <div class="search-box">
+          <Search :size="18" class="search-icon" />
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Cari mata kuliah..."
+            class="search-input"
+          />
         </div>
-        <div class="card-body">
-          <p><strong>Kode:</strong> {{ matkul.kode }}</p>
-          <p><strong>SKS:</strong> {{ matkul.sks }}</p>
-          <p><strong>Semester:</strong> {{ matkul.semester }}</p>
-          <p><strong>Jumlah Mahasiswa:</strong> {{ matkul.jumlahMahasiswa }}</p>
-        </div>
-        <div class="card-actions">
-          <button class="btn-edit">Edit</button>
-          <button class="btn-detail">Detail</button>
-          <button class="btn-delete">Hapus</button>
-        </div>
+        <select v-model="statusFilter" class="filter-select">
+          <option value="">Semua Status</option>
+          <option value="Aktif">Aktif</option>
+          <option value="Persiapan">Persiapan</option>
+        </select>
+        <select v-model="semesterFilter" class="filter-select">
+          <option value="">Semua Semester</option>
+          <option value="Ganjil 2024/2025">Ganjil 2024/2025</option>
+          <option value="Genap 2024/2025">Genap 2024/2025</option>
+        </select>
       </div>
-    </div>
+    </template>
+
+    <!-- Table -->
+    <template #table>
+      <DataTable
+        :columns="columns"
+        :data="paginatedMataKuliahList"
+        :row-key="'id'"
+        @sort="handleSort"
+        @row-click="handleRowClick"
+      >
+        <!-- Status Column -->
+        <template #cell-status="{ value }">
+          <span :class="['status-badge', value.toLowerCase()]">
+            {{ value }}
+          </span>
+        </template>
+
+        <!-- Actions Column -->
+        <template #cell-actions="{ item }">
+          <div class="action-buttons">
+            <button class="btn-action btn-edit" @click="editMataKuliah(item)" title="Edit Mata Kuliah">
+              <Edit2 :size="14" />
+            </button>
+            <button class="btn-action btn-view" @click="viewDetail(item)" title="Lihat Detail">
+              <Eye :size="14" />
+            </button>
+            <button class="btn-action btn-delete" @click="deleteMataKuliah(item)" title="Hapus Mata Kuliah">
+              <Trash2 :size="14" />
+            </button>
+          </div>
+        </template>
+      </DataTable>
+    </template>
+
+    <!-- Pagination -->
+    <template #pagination>
+      <TablePagination
+        :current-page="currentPage"
+        :page-size="itemsPerPage"
+        :total="filteredMataKuliahList.length"
+        @page-change="currentPage = $event"
+      />
+    </template>
+  </TableLayout>
 
     <!-- Modal untuk menambah mata kuliah -->
     <div v-if="showModal" class="modal-overlay" @click="showModal = false">
@@ -59,11 +112,14 @@
         </form>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { Plus, Search, Edit2, Eye, Trash2 } from 'lucide-vue-next'
+import TableLayout from '../components/TableLayout.vue'
+import DataTable, { type TableColumn } from '../components/DataTable.vue'
+import TablePagination from '../components/TablePagination.vue'
 
 interface MataKuliah {
   id: number
@@ -75,6 +131,18 @@ interface MataKuliah {
   jumlahMahasiswa: number
 }
 
+// Table columns definition
+const columns: TableColumn[] = [
+  { key: 'kode', title: 'Kode', sortable: true, width: 'sm' },
+  { key: 'nama', title: 'Nama Mata Kuliah', sortable: true },
+  { key: 'sks', title: 'SKS', sortable: true, align: 'center', width: 'sm' },
+  { key: 'semester', title: 'Semester', sortable: true },
+  { key: 'jumlahMahasiswa', title: 'Mahasiswa', sortable: true, align: 'center', width: 'sm' },
+  { key: 'status', title: 'Status', sortable: true },
+  { key: 'actions', title: 'Aksi', width: 'md' }
+]
+
+// Reactive data
 const showModal = ref(false)
 const mataKuliahList = ref<MataKuliah[]>([
   {
@@ -113,6 +181,101 @@ const newMatkul = ref({
   semester: ''
 })
 
+// Filter and search states
+const searchQuery = ref('')
+const statusFilter = ref('')
+const semesterFilter = ref('')
+
+// Pagination states
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+
+// Sorting states
+const sortColumn = ref('')
+const sortDirection = ref<'asc' | 'desc'>('asc')
+
+// Computed properties
+const filteredMataKuliahList = computed(() => {
+  let filtered = mataKuliahList.value
+
+  // Apply search filter
+  if (searchQuery.value) {
+    filtered = filtered.filter(matkul => 
+      matkul.nama.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      matkul.kode.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  }
+
+  // Apply status filter
+  if (statusFilter.value) {
+    filtered = filtered.filter(matkul => matkul.status === statusFilter.value)
+  }
+
+  // Apply semester filter
+  if (semesterFilter.value) {
+    filtered = filtered.filter(matkul => matkul.semester === semesterFilter.value)
+  }
+
+  // Apply sorting
+  if (sortColumn.value) {
+    filtered.sort((a, b) => {
+      const aVal = a[sortColumn.value as keyof MataKuliah]
+      const bVal = b[sortColumn.value as keyof MataKuliah]
+      
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection.value === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal)
+      }
+      
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection.value === 'asc' ? aVal - bVal : bVal - aVal
+      }
+      
+      return 0
+    })
+  }
+
+  return filtered
+})
+
+const paginatedMataKuliahList = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredMataKuliahList.value.slice(start, end)
+})
+
+// Methods
+const handleSort = (column: string) => {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDirection.value = 'asc'
+  }
+}
+
+const handleRowClick = (item: MataKuliah, index: number) => {
+  console.log('Row clicked:', item, index)
+}
+
+const editMataKuliah = (matkul: MataKuliah) => {
+  console.log('Edit mata kuliah:', matkul.nama)
+}
+
+const viewDetail = (matkul: MataKuliah) => {
+  console.log('View detail:', matkul.nama)
+}
+
+const deleteMataKuliah = (matkul: MataKuliah) => {
+  if (confirm(`Apakah Anda yakin ingin menghapus mata kuliah ${matkul.nama}?`)) {
+    const index = mataKuliahList.value.findIndex(item => item.id === matkul.id)
+    if (index !== -1) {
+      mataKuliahList.value.splice(index, 1)
+    }
+  }
+}
+
 const addMataKuliah = () => {
   const id = Math.max(...mataKuliahList.value.map(m => m.id)) + 1
   mataKuliahList.value.push({
@@ -128,122 +291,158 @@ const addMataKuliah = () => {
 </script>
 
 <style scoped>
-.manajemen-mata-kuliah {
-  padding: 24px;
+/* Filter Group */
+.filter-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
-.manajemen-mata-kuliah h1 {
-  color: #374151;
-  margin-bottom: 16px;
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
 }
 
-.manajemen-mata-kuliah p {
-  color: #6b7280;
-  margin-bottom: 32px;
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--oba-text-light);
+  z-index: 1;
 }
 
-.actions {
-  margin-bottom: 24px;
-}
-
-.btn-primary {
-  background-color: #1e40af;
-  color: white;
-  border: none;
-  padding: 12px 24px;
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid var(--oba-border);
   border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--oba-white);
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--oba-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.filter-select {
+  padding: 10px 12px;
+  border: 1px solid var(--oba-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--oba-white);
+  color: var(--oba-text);
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--oba-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+/* Primary Button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--oba-primary) 0%, var(--oba-primary-light) 100%);
+  color: var(--oba-white);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
 }
 
 .btn-primary:hover {
-  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
 }
 
-.mata-kuliah-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.mata-kuliah-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 16px;
-}
-
-.card-header h3 {
-  margin: 0;
-  color: #374151;
-  font-size: 1.125rem;
-}
-
-.status {
-  padding: 4px 8px;
-  border-radius: 4px;
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
-.status.aktif {
+.status-badge.aktif {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.status.persiapan {
+.status-badge.persiapan {
   background-color: #fef3c7;
   color: #92400e;
 }
 
-.card-body {
-  margin-bottom: 16px;
-}
-
-.card-body p {
-  margin-bottom: 8px;
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.card-actions {
+/* Action Buttons */
+.action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
-.btn-edit, .btn-detail, .btn-delete {
-  padding: 6px 12px;
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.75rem;
-  flex: 1;
+  transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
 }
 
 .btn-edit {
   background-color: #3b82f6;
-  color: white;
+  color: var(--oba-white);
 }
 
-.btn-detail {
+.btn-edit:hover {
+  background-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-view {
   background-color: #6b7280;
-  color: white;
+  color: var(--oba-white);
+}
+
+.btn-view:hover {
+  background-color: #4b5563;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
 }
 
 .btn-delete {
   background-color: #dc2626;
-  color: white;
+  color: var(--oba-white);
 }
 
+.btn-delete:hover {
+  background-color: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -258,18 +457,22 @@ const addMataKuliah = () => {
 }
 
 .modal {
-  background: white;
+  background: var(--oba-white);
   padding: 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  border: 1px solid var(--oba-border);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
 }
 
 .modal h2 {
   margin-bottom: 20px;
-  color: #374151;
+  color: var(--oba-text);
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .form-group {
@@ -278,41 +481,99 @@ const addMataKuliah = () => {
 
 .form-group label {
   display: block;
-  margin-bottom: 4px;
-  color: #374151;
-  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--oba-text);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--oba-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--oba-white);
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--oba-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
 .modal-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .btn-cancel {
   background-color: #6b7280;
-  color: white;
+  color: var(--oba-white);
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #4b5563;
 }
 
 .btn-save {
   background-color: #059669;
-  color: white;
+  color: var(--oba-white);
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box {
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>

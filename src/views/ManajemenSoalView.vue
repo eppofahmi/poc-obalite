@@ -1,67 +1,111 @@
 <template>
-  <div class="manajemen-soal">
-    <h1>Manajemen Soal</h1>
-    <p>Kelola bank soal untuk ujian dan kuis.</p>
-    
-    <div class="filters">
+  <TableLayout 
+    title="Manajemen Soal" 
+    subtitle="Kelola bank soal untuk ujian dan kuis"
+  >
+    <!-- Header Actions -->
+    <template #headerActions>
+      <button class="btn-primary" @click="showAddModal = true">
+        <Plus :size="18" />
+        Tambah Soal
+      </button>
+    </template>
+
+    <!-- Filters -->
+    <template #filters>
       <div class="filter-group">
-        <label>Mata Kuliah:</label>
-        <select v-model="selectedMataKuliah">
+        <div class="search-box">
+          <Search :size="18" class="search-icon" />
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Cari soal..."
+            class="search-input"
+          />
+        </div>
+        <select v-model="selectedMataKuliah" class="filter-select">
           <option value="">Semua Mata Kuliah</option>
           <option value="TI301">Pemrograman Web</option>
           <option value="TI302">Basis Data</option>
           <option value="TI401">Mobile Programming</option>
         </select>
-      </div>
-      <div class="filter-group">
-        <label>Jenis Soal:</label>
-        <select v-model="selectedJenis">
+        <select v-model="selectedJenis" class="filter-select">
           <option value="">Semua Jenis</option>
           <option value="Pilihan Ganda">Pilihan Ganda</option>
           <option value="Essay">Essay</option>
           <option value="Praktik">Praktik</option>
         </select>
+        <select v-model="selectedKesulitan" class="filter-select">
+          <option value="">Semua Tingkat</option>
+          <option value="Mudah">Mudah</option>
+          <option value="Sedang">Sedang</option>
+          <option value="Sulit">Sulit</option>
+        </select>
       </div>
-      <button class="btn-primary" @click="showAddModal = true">Tambah Soal</button>
-    </div>
+    </template>
 
-    <div class="soal-table">
-      <table>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Mata Kuliah</th>
-            <th>Pertanyaan</th>
-            <th>Jenis</th>
-            <th>Tingkat Kesulitan</th>
-            <th>Dibuat</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(soal, index) in filteredSoal" :key="soal.id">
-            <td>{{ index + 1 }}</td>
-            <td>{{ soal.mataKuliah }}</td>
-            <td class="question-cell">{{ soal.pertanyaan }}</td>
-            <td>
-              <span :class="['badge', soal.jenis.toLowerCase().replace(' ', '-')]">
-                {{ soal.jenis }}
-              </span>
-            </td>
-            <td>
-              <span :class="['difficulty', soal.tingkatKesulitan.toLowerCase()]">
-                {{ soal.tingkatKesulitan }}
-              </span>
-            </td>
-            <td>{{ formatDate(soal.tanggalDibuat) }}</td>
-            <td>
-              <button class="btn-edit" @click="editSoal(soal)">Edit</button>
-              <button class="btn-delete" @click="deleteSoal(soal.id)">Hapus</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Table -->
+    <template #table>
+      <DataTable
+        :columns="columns"
+        :data="paginatedSoalList"
+        :row-key="'id'"
+        @sort="handleSort"
+        @row-click="handleRowClick"
+      >
+        <!-- Question Column -->
+        <template #cell-pertanyaan="{ value }">
+          <div class="question-cell" :title="value">
+            {{ value }}
+          </div>
+        </template>
+
+        <!-- Type Column -->
+        <template #cell-jenis="{ value }">
+          <span :class="['type-badge', value.toLowerCase().replace(' ', '-')]">
+            {{ value }}
+          </span>
+        </template>
+
+        <!-- Difficulty Column -->
+        <template #cell-tingkatKesulitan="{ value }">
+          <span :class="['difficulty-badge', value.toLowerCase()]">
+            {{ value }}
+          </span>
+        </template>
+
+        <!-- Date Column -->
+        <template #cell-tanggalDibuat="{ value }">
+          {{ formatDate(value) }}
+        </template>
+
+        <!-- Actions Column -->
+        <template #cell-actions="{ item }">
+          <div class="action-buttons">
+            <button class="btn-action btn-edit" @click="editSoal(item)" title="Edit Soal">
+              <Edit2 :size="14" />
+            </button>
+            <button class="btn-action btn-view" @click="viewSoal(item)" title="Lihat Detail">
+              <Eye :size="14" />
+            </button>
+            <button class="btn-action btn-delete" @click="deleteSoal(item.id)" title="Hapus Soal">
+              <Trash2 :size="14" />
+            </button>
+          </div>
+        </template>
+      </DataTable>
+    </template>
+
+    <!-- Pagination -->
+    <template #pagination>
+      <TablePagination
+        :current-page="currentPage"
+        :page-size="itemsPerPage"
+        :total="filteredSoalList.length"
+        @page-change="currentPage = $event"
+      />
+    </template>
+  </TableLayout>
 
     <!-- Modal Add/Edit Soal -->
     <div v-if="showAddModal || showEditModal" class="modal-overlay" @click="closeModal">
@@ -126,11 +170,14 @@
         </form>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { Plus, Search, Edit2, Eye, Trash2 } from 'lucide-vue-next'
+import TableLayout from '../components/TableLayout.vue'
+import DataTable, { type TableColumn } from '../components/DataTable.vue'
+import TablePagination from '../components/TablePagination.vue'
 
 interface Soal {
   id: number
@@ -143,10 +190,31 @@ interface Soal {
   jawabanBenar?: number
 }
 
+// Table columns definition
+const columns: TableColumn[] = [
+  { key: 'mataKuliah', title: 'Mata Kuliah', sortable: true, width: 'md' },
+  { key: 'pertanyaan', title: 'Pertanyaan', sortable: true },
+  { key: 'jenis', title: 'Jenis', sortable: true, align: 'center', width: 'sm' },
+  { key: 'tingkatKesulitan', title: 'Kesulitan', sortable: true, align: 'center', width: 'sm' },
+  { key: 'tanggalDibuat', title: 'Dibuat', sortable: true, width: 'sm' },
+  { key: 'actions', title: 'Aksi', width: 'md' }
+]
+
+// Reactive data
 const selectedMataKuliah = ref('')
 const selectedJenis = ref('')
+const selectedKesulitan = ref('')
+const searchQuery = ref('')
 const showAddModal = ref(false)
 const showEditModal = ref(false)
+
+// Pagination states
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+
+// Sorting states
+const sortColumn = ref('')
+const sortDirection = ref<'asc' | 'desc'>('asc')
 
 const soalList = ref<Soal[]>([
   {
@@ -186,13 +254,78 @@ const currentSoal = ref<Partial<Soal>>({
   jawabanBenar: undefined
 })
 
-const filteredSoal = computed(() => {
-  return soalList.value.filter(soal => {
-    const matchMatkul = !selectedMataKuliah.value || soal.mataKuliah === selectedMataKuliah.value
-    const matchJenis = !selectedJenis.value || soal.jenis === selectedJenis.value
-    return matchMatkul && matchJenis
-  })
+// Computed properties
+const filteredSoalList = computed(() => {
+  let filtered = soalList.value
+
+  // Apply search filter
+  if (searchQuery.value) {
+    filtered = filtered.filter(soal => 
+      soal.pertanyaan.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      soal.mataKuliah.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  }
+
+  // Apply mata kuliah filter
+  if (selectedMataKuliah.value) {
+    filtered = filtered.filter(soal => soal.mataKuliah === selectedMataKuliah.value)
+  }
+
+  // Apply jenis filter
+  if (selectedJenis.value) {
+    filtered = filtered.filter(soal => soal.jenis === selectedJenis.value)
+  }
+
+  // Apply kesulitan filter
+  if (selectedKesulitan.value) {
+    filtered = filtered.filter(soal => soal.tingkatKesulitan === selectedKesulitan.value)
+  }
+
+  // Apply sorting
+  if (sortColumn.value) {
+    filtered.sort((a, b) => {
+      const aVal = a[sortColumn.value as keyof Soal]
+      const bVal = b[sortColumn.value as keyof Soal]
+      
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection.value === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal)
+      }
+      
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection.value === 'asc' ? aVal - bVal : bVal - aVal
+      }
+      
+      return 0
+    })
+  }
+
+  return filtered
 })
+
+const paginatedSoalList = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredSoalList.value.slice(start, end)
+})
+
+// For backward compatibility in modal
+const filteredSoal = computed(() => filteredSoalList.value)
+
+// Methods
+const handleSort = (column: string) => {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDirection.value = 'asc'
+  }
+}
+
+const handleRowClick = (item: Soal, index: number) => {
+  console.log('Row clicked:', item, index)
+}
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('id-ID')
@@ -204,6 +337,10 @@ const editSoal = (soal: Soal) => {
     currentSoal.value.pilihan = ['', '', '', '']
   }
   showEditModal.value = true
+}
+
+const viewSoal = (soal: Soal) => {
+  console.log('View soal:', soal.pertanyaan)
 }
 
 const deleteSoal = (id: number) => {
@@ -244,154 +381,199 @@ const closeModal = () => {
 </script>
 
 <style scoped>
-.manajemen-soal {
-  padding: 24px;
-}
-
-.manajemen-soal h1 {
-  color: #374151;
-  margin-bottom: 16px;
-}
-
-.manajemen-soal p {
-  color: #6b7280;
-  margin-bottom: 32px;
-}
-
-.filters {
-  display: flex;
-  gap: 20px;
-  align-items: end;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
+/* Filter Group */
 .filter-group {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  gap: 16px;
+  align-items: center;
 }
 
-.filter-group label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
 }
 
-.filter-group select {
-  padding: 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  min-width: 150px;
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--oba-text-light);
+  z-index: 1;
 }
 
-.btn-primary {
-  background-color: #1e40af;
-  color: white;
-  border: none;
-  padding: 8px 16px;
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid var(--oba-border);
   border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--oba-white);
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--oba-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.filter-select {
+  padding: 10px 12px;
+  border: 1px solid var(--oba-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--oba-white);
+  color: var(--oba-text);
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--oba-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+/* Primary Button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--oba-primary) 0%, var(--oba-primary-light) 100%);
+  color: var(--oba-white);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 500;
-  height: fit-content;
-}
-
-.soal-table {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  background-color: #f9fafb;
   font-weight: 600;
-  color: #374151;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
 }
 
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+/* Question Cell */
 .question-cell {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: help;
 }
 
-.badge {
-  padding: 4px 8px;
-  border-radius: 4px;
+/* Type Badge */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
-.badge.pilihan-ganda {
+.type-badge.pilihan-ganda {
   background-color: #dbeafe;
   color: #1e40af;
 }
 
-.badge.essay {
+.type-badge.essay {
   background-color: #fef3c7;
   color: #92400e;
 }
 
-.badge.praktik {
+.type-badge.praktik {
   background-color: #ecfdf5;
   color: #059669;
 }
 
-.difficulty {
-  padding: 4px 8px;
-  border-radius: 4px;
+/* Difficulty Badge */
+.difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
-.difficulty.mudah {
+.difficulty-badge.mudah {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.difficulty.sedang {
+.difficulty-badge.sedang {
   background-color: #fef3c7;
   color: #92400e;
 }
 
-.difficulty.sulit {
+.difficulty-badge.sulit {
   background-color: #fecaca;
   color: #991b1b;
 }
 
-.btn-edit, .btn-delete {
-  padding: 6px 12px;
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.75rem;
-  margin-right: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
 }
 
 .btn-edit {
   background-color: #3b82f6;
-  color: white;
+  color: var(--oba-white);
+}
+
+.btn-edit:hover {
+  background-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-view {
+  background-color: #6b7280;
+  color: var(--oba-white);
+}
+
+.btn-view:hover {
+  background-color: #4b5563;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
 }
 
 .btn-delete {
   background-color: #dc2626;
-  color: white;
+  color: var(--oba-white);
 }
 
+.btn-delete:hover {
+  background-color: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -406,18 +588,22 @@ th {
 }
 
 .modal {
-  background: white;
+  background: var(--oba-white);
   padding: 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  border: 1px solid var(--oba-border);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
 }
 
 .modal h2 {
   margin-bottom: 20px;
-  color: #374151;
+  color: var(--oba-text);
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .form-group {
@@ -426,18 +612,32 @@ th {
 
 .form-group label {
   display: block;
-  margin-bottom: 4px;
-  color: #374151;
-  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--oba-text);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--oba-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--oba-white);
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--oba-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
 .pilihan-item {
@@ -448,24 +648,69 @@ th {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .btn-cancel {
   background-color: #6b7280;
-  color: white;
+  color: var(--oba-white);
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #4b5563;
 }
 
 .btn-save {
   background-color: #059669;
-  color: white;
+  color: var(--oba-white);
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box {
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
