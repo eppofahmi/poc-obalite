@@ -60,7 +60,8 @@ router.beforeEach((to, from, next) => {
     next('/dashboard')
   } else if (to.meta.roles && userStore.user) {
     const userRole = userStore.user.role
-    if (to.meta.roles.includes(userRole)) {
+    const roles = to.meta.roles as string[]
+    if (roles.includes(userRole)) {
       next()
     } else {
       next('/dashboard')

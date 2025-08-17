@@ -106,7 +106,7 @@
           <div v-if="currentSoal.jenis === 'Pilihan Ganda'" class="form-group">
             <label>Pilihan Jawaban</label>
             <div v-for="(pilihan, index) in currentSoal.pilihan" :key="index" class="pilihan-item">
-              <input v-model="currentSoal.pilihan[index]" :placeholder="`Pilihan ${String.fromCharCode(65 + index)}`" required>
+              <input v-model="currentSoal.pilihan![index]" :placeholder="`Pilihan ${String.fromCharCode(65 + index)}`" required>
             </div>
             <div class="form-group">
               <label>Jawaban Benar</label>
