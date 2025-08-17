@@ -1,0 +1,78 @@
+{
+  "rps": [
+    {
+      "id": "rps-001",
+      "mataKuliahId": "mk-001",
+      "mataKuliah": "Pemrograman Web",
+      "semester": "Ganjil 2024/2025",
+      "sks": 3,
+      "status": "Aktif",
+      "dosenId": "user-002",
+      "content": {
+        "cplProdi": [
+          "Mampu menganalisis dan merancang sistem informasi",
+          "Mampu mengimplementasikan solusi berbasis teknologi informasi"
+        ],
+        "cplMataKuliah": [
+          "Mahasiswa mampu membuat aplikasi web responsif",
+          "Mahasiswa mampu menggunakan framework web modern"
+        ],
+        "pertemuanList": [
+          {
+            "mingguKe": 1,
+            "materi": "Pengenalan Web Development dan HTML5",
+            "metode": "Ceramah dan Praktikum",
+            "waktu": 150,
+            "pengalaman": "Membuat struktur halaman web dasar",
+            "kriteria": "Ketepatan struktur HTML dan semantic markup",
+            "bobot": 5
+          },
+          {
+            "mingguKe": 2,
+            "materi": "CSS3 dan Responsive Design",
+            "metode": "Praktikum",
+            "waktu": 150,
+            "pengalaman": "Styling halaman web dengan CSS3",
+            "kriteria": "Desain responsive dan cross-browser compatibility",
+            "bobot": 10
+          }
+        ]
+      },
+      "createdAt": "2024-01-20T00:00:00.000Z",
+      "updatedAt": "2024-01-20T00:00:00.000Z"
+    },
+    {
+      "id": "rps-002",
+      "mataKuliahId": "mk-002",
+      "mataKuliah": "Basis Data",
+      "semester": "Ganjil 2024/2025",
+      "sks": 3,
+      "status": "Draft",
+      "dosenId": "user-002",
+      "createdAt": "2024-01-21T00:00:00.000Z",
+      "updatedAt": "2024-01-21T00:00:00.000Z"
+    },
+    {
+      "id": "rps-003",
+      "mataKuliahId": "mk-004",
+      "mataKuliah": "Algoritma dan Struktur Data",
+      "semester": "Ganjil 2024/2025",
+      "sks": 4,
+      "status": "Aktif",
+      "dosenId": "user-003",
+      "createdAt": "2024-01-22T00:00:00.000Z",
+      "updatedAt": "2024-01-22T00:00:00.000Z"
+    },
+    {
+      "id": "rps-004",
+      "mataKuliahId": "mk-006",
+      "mataKuliah": "Jaringan Komputer",
+      "semester": "Genap 2024/2025",
+      "sks": 3,
+      "status": "Review",
+      "dosenId": "user-002",
+      "createdAt": "2024-01-23T00:00:00.000Z",
+      "updatedAt": "2024-01-23T00:00:00.000Z"
+    }
+  ]
+}

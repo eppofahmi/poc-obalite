@@ -1,0 +1,139 @@
+{
+  "publikasi": [
+    {
+      "id": "pub-001",
+      "judul": "Machine Learning Approaches for Educational Data Mining in Higher Education",
+      "jurnal": "International Journal of Educational Technology",
+      "tahun": 2024,
+      "penulis": ["Dr. Ahmad Susanto", "Dr. Jane Smith", "Prof. John Doe"],
+      "status": "Published",
+      "doi": "10.1016/j.ijedt.2024.001",
+      "url": "https://doi.org/10.1016/j.ijedt.2024.001",
+      "abstrak": "This study explores the application of machine learning algorithms in educational data mining to improve learning outcomes in higher education institutions.",
+      "keywords": ["machine learning", "educational data mining", "higher education", "learning analytics"],
+      "dosenId": "user-002",
+      "createdAt": "2024-01-31T00:00:00.000Z",
+      "updatedAt": "2024-01-31T00:00:00.000Z"
+    },
+    {
+      "id": "pub-002",
+      "judul": "Web-based Learning Management System Design Using Modern Framework",
+      "jurnal": "Journal of Computer Science Education",
+      "tahun": 2023,
+      "penulis": ["Dr. Ahmad Susanto", "Dr. Siti Nurhaliza"],
+      "status": "Published",
+      "doi": "10.1145/jcse.2023.456",
+      "url": "https://doi.org/10.1145/jcse.2023.456",
+      "abstrak": "A comprehensive study on designing and implementing a web-based learning management system using modern web frameworks and technologies.",
+      "keywords": ["web development", "learning management system", "education technology", "vue.js"],
+      "dosenId": "user-002",
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "updatedAt": "2024-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "pub-003",
+      "judul": "Adaptive Algorithm Analysis for Computer Science Students",
+      "jurnal": "ACM Computing Education Review",
+      "tahun": 2024,
+      "penulis": ["Dr. Siti Nurhaliza", "Prof. Alan Turing"],
+      "status": "Under Review",
+      "abstrak": "This paper presents an adaptive approach to teaching algorithm analysis that adjusts to individual student learning patterns and preferences.",
+      "keywords": ["adaptive learning", "algorithm analysis", "computer science education", "personalized learning"],
+      "dosenId": "user-003",
+      "createdAt": "2024-02-02T00:00:00.000Z",
+      "updatedAt": "2024-02-02T00:00:00.000Z"
+    }
+  ],
+  "penelitian": [
+    {
+      "id": "pen-001",
+      "judul": "Pengembangan Sistem Pembelajaran Adaptif Berbasis AI untuk Pendidikan Tinggi",
+      "jenis": "Terapan",
+      "tahunMulai": 2024,
+      "status": "Berjalan",
+      "sumberDana": "Kemenristekdikti",
+      "jumlahDana": 250000000,
+      "abstrak": "Penelitian ini bertujuan mengembangkan sistem pembelajaran adaptif yang menggunakan artificial intelligence untuk mempersonalisasi pengalaman belajar mahasiswa.",
+      "keywords": ["artificial intelligence", "adaptive learning", "higher education", "personalization"],
+      "timPeneliti": ["Dr. Ahmad Susanto", "Dr. Siti Nurhaliza", "Dr. Budi Santoso"],
+      "dosenId": "user-002",
+      "createdAt": "2024-02-03T00:00:00.000Z",
+      "updatedAt": "2024-02-03T00:00:00.000Z"
+    },
+    {
+      "id": "pen-002",
+      "judul": "Analisis Performa Database NoSQL untuk Big Data dalam Aplikasi Pendidikan",
+      "jenis": "Fundamental",
+      "tahunMulai": 2023,
+      "tahunSelesai": 2024,
+      "status": "Selesai",
+      "sumberDana": "Internal Universitas",
+      "jumlahDana": 75000000,
+      "abstrak": "Studi komparatif performa berbagai database NoSQL (MongoDB, Cassandra, Redis) dalam menangani big data untuk aplikasi pendidikan.",
+      "keywords": ["nosql", "big data", "database performance", "education systems"],
+      "timPeneliti": ["Dr. Ahmad Susanto", "Dr. Maria Garcia"],
+      "dosenId": "user-002",
+      "createdAt": "2024-02-04T00:00:00.000Z",
+      "updatedAt": "2024-02-04T00:00:00.000Z"
+    },
+    {
+      "id": "pen-003",
+      "judul": "Optimisasi Algoritma Sorting untuk Dataset Akademik Besar",
+      "jenis": "Fundamental",
+      "tahunMulai": 2024,
+      "status": "Berjalan",
+      "sumberDana": "Hibah Penelitian Dosen",
+      "jumlahDana": 50000000,
+      "abstrak": "Penelitian untuk mengoptimalkan berbagai algoritma sorting dalam menangani dataset akademik berukuran besar dengan karakteristik data yang spesifik.",
+      "keywords": ["sorting algorithms", "optimization", "big data", "academic datasets"],
+      "timPeneliti": ["Dr. Siti Nurhaliza", "Dr. Robert Johnson"],
+      "dosenId": "user-003",
+      "createdAt": "2024-02-05T00:00:00.000Z",
+      "updatedAt": "2024-02-05T00:00:00.000Z"
+    }
+  ],
+  "pengabdian": [
+    {
+      "id": "peng-001",
+      "judul": "Pelatihan Web Development untuk UMKM di Yogyakarta",
+      "lokasi": "Yogyakarta, DIY",
+      "tahun": 2024,
+      "jumlahPeserta": 50,
+      "status": "Selesai",
+      "deskripsi": "Program pelatihan intensif pengembangan website untuk pelaku UMKM di Yogyakarta, mencakup HTML, CSS, JavaScript, dan WordPress.",
+      "mitra": "Dinas Koperasi dan UMKM DIY",
+      "timPelaksana": ["Dr. Ahmad Susanto", "Dr. Siti Nurhaliza", "Mahasiswa TI"],
+      "dosenId": "user-002",
+      "createdAt": "2024-02-06T00:00:00.000Z",
+      "updatedAt": "2024-02-06T00:00:00.000Z"
+    },
+    {
+      "id": "peng-002",
+      "judul": "Workshop Digital Marketing dan E-commerce untuk Guru SMK",
+      "lokasi": "Jakarta",
+      "tahun": 2023,
+      "jumlahPeserta": 75,
+      "status": "Selesai",
+      "deskripsi": "Workshop untuk meningkatkan kemampuan guru SMK dalam digital marketing dan pengelolaan toko online, sebagai bekal mengajar mata pelajaran prakarya dan kewirausahaan.",
+      "mitra": "Dinas Pendidikan DKI Jakarta",
+      "timPelaksana": ["Dr. Ahmad Susanto", "Dr. Lisa Wong", "Tim Mahasiswa"],
+      "dosenId": "user-002",
+      "createdAt": "2024-02-07T00:00:00.000Z",
+      "updatedAt": "2024-02-07T00:00:00.000Z"
+    },
+    {
+      "id": "peng-003",
+      "judul": "Sosialisasi Algoritma dan Pemrograman untuk Siswa SMA",
+      "lokasi": "Bandung, Jawa Barat",
+      "tahun": 2024,
+      "jumlahPeserta": 120,
+      "status": "Berjalan",
+      "deskripsi": "Program pengenalan konsep algoritma dan pemrograman dasar untuk siswa SMA sebagai persiapan menghadapi era digital dan computational thinking.",
+      "mitra": "SMA Negeri 1 Bandung",
+      "timPelaksana": ["Dr. Siti Nurhaliza", "Dr. Ahmad Susanto", "Himpunan Mahasiswa TI"],
+      "dosenId": "user-003",
+      "createdAt": "2024-02-08T00:00:00.000Z",
+      "updatedAt": "2024-02-08T00:00:00.000Z"
+    }
+  ]
+}

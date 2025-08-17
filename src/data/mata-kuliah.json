@@ -1,0 +1,82 @@
+{
+  "mataKuliah": [
+    {
+      "id": "mk-001",
+      "kode": "TI301",
+      "nama": "Pemrograman Web",
+      "sks": 3,
+      "semester": "Ganjil 2024/2025",
+      "status": "Aktif",
+      "jumlahMahasiswa": 35,
+      "deskripsi": "Mata kuliah yang membahas konsep dasar pengembangan aplikasi web menggunakan teknologi modern seperti HTML5, CSS3, JavaScript, dan framework web.",
+      "dosenId": "user-002",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "mk-002",
+      "kode": "TI302",
+      "nama": "Basis Data",
+      "sks": 3,
+      "semester": "Ganjil 2024/2025",
+      "status": "Aktif",
+      "jumlahMahasiswa": 42,
+      "deskripsi": "Mata kuliah yang membahas konsep sistem basis data relasional, desain database, SQL, dan implementasi database dalam aplikasi.",
+      "dosenId": "user-002",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "mk-003",
+      "kode": "TI401",
+      "nama": "Mobile Programming",
+      "sks": 4,
+      "semester": "Genap 2024/2025",
+      "status": "Persiapan",
+      "jumlahMahasiswa": 0,
+      "deskripsi": "Mata kuliah yang membahas pengembangan aplikasi mobile untuk platform Android dan iOS menggunakan teknologi cross-platform.",
+      "dosenId": "user-002",
+      "createdAt": "2024-01-16T00:00:00.000Z",
+      "updatedAt": "2024-01-16T00:00:00.000Z"
+    },
+    {
+      "id": "mk-004",
+      "kode": "TI303",
+      "nama": "Algoritma dan Struktur Data",
+      "sks": 4,
+      "semester": "Ganjil 2024/2025",
+      "status": "Aktif",
+      "jumlahMahasiswa": 38,
+      "deskripsi": "Mata kuliah yang membahas algoritma fundamental, analisis kompleksitas, dan struktur data seperti array, linked list, stack, queue, tree, dan graph.",
+      "dosenId": "user-003",
+      "createdAt": "2024-01-17T00:00:00.000Z",
+      "updatedAt": "2024-01-17T00:00:00.000Z"
+    },
+    {
+      "id": "mk-005",
+      "kode": "TI304",
+      "nama": "Sistem Operasi",
+      "sks": 3,
+      "semester": "Genap 2024/2025",
+      "status": "Persiapan",
+      "jumlahMahasiswa": 0,
+      "deskripsi": "Mata kuliah yang membahas konsep sistem operasi, manajemen proses, memori, file system, dan keamanan sistem.",
+      "dosenId": "user-003",
+      "createdAt": "2024-01-18T00:00:00.000Z",
+      "updatedAt": "2024-01-18T00:00:00.000Z"
+    },
+    {
+      "id": "mk-006",
+      "kode": "TI402",
+      "nama": "Jaringan Komputer",
+      "sks": 3,
+      "semester": "Genap 2024/2025",
+      "status": "Aktif",
+      "jumlahMahasiswa": 33,
+      "deskripsi": "Mata kuliah yang membahas konsep jaringan komputer, protokol TCP/IP, routing, switching, dan keamanan jaringan.",
+      "dosenId": "user-002",
+      "createdAt": "2024-01-19T00:00:00.000Z",
+      "updatedAt": "2024-01-19T00:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "soal": [
+    {
+      "id": "soal-001",
+      "mataKuliahId": "mk-001",
+      "mataKuliah": "Pemrograman Web",
+      "pertanyaan": "Apa kepanjangan dari HTML?",
+      "jenis": "Pilihan Ganda",
+      "tingkatKesulitan": "Mudah",
+      "pilihan": [
+        "HyperText Markup Language",
+        "Home Tool Markup Language", 
+        "Hyperlinks and Text Markup Language",
+        "HyperText Machine Language"
+      ],
+      "jawabanBenar": 0,
+      "poin": 10,
+      "kategori": "Fundamental",
+      "tags": ["html", "basic", "web"],
+      "dosenId": "user-002",
+      "createdAt": "2024-01-25T00:00:00.000Z",
+      "updatedAt": "2024-01-25T00:00:00.000Z"
+    },
+    {
+      "id": "soal-002",
+      "mataKuliahId": "mk-002",
+      "mataKuliah": "Basis Data",
+      "pertanyaan": "Jelaskan perbedaan antara PRIMARY KEY dan FOREIGN KEY dalam database beserta contoh penggunaannya!",
+      "jenis": "Essay",
+      "tingkatKesulitan": "Sedang",
+      "poin": 25,
+      "kategori": "Konsep",
+      "tags": ["database", "primary-key", "foreign-key", "relational"],
+      "dosenId": "user-002",
+      "createdAt": "2024-01-26T00:00:00.000Z",
+      "updatedAt": "2024-01-26T00:00:00.000Z"
+    },
+    {
+      "id": "soal-003",
+      "mataKuliahId": "mk-003",
+      "mataKuliah": "Mobile Programming",
+      "pertanyaan": "Buat aplikasi mobile sederhana dengan Flutter yang menampilkan daftar item dan dapat menambah item baru. Upload source code dan screenshot aplikasi.",
+      "jenis": "Praktik",
+      "tingkatKesulitan": "Sulit",
+      "poin": 50,
+      "kategori": "Implementasi",
+      "tags": ["flutter", "mobile", "crud", "practical"],
+      "dosenId": "user-002",
+      "createdAt": "2024-01-27T00:00:00.000Z",
+      "updatedAt": "2024-01-27T00:00:00.000Z"
+    },
+    {
+      "id": "soal-004",
+      "mataKuliahId": "mk-001",
+      "mataKuliah": "Pemrograman Web",
+      "pertanyaan": "CSS Grid lebih baik daripada Flexbox untuk semua layout responsive.",
+      "jenis": "True/False",
+      "tingkatKesulitan": "Sedang",
+      "jawabanBenar": "False",
+      "poin": 15,
+      "kategori": "Layout",
+      "tags": ["css", "grid", "flexbox", "responsive"],
+      "dosenId": "user-002",
+      "createdAt": "2024-01-28T00:00:00.000Z",
+      "updatedAt": "2024-01-28T00:00:00.000Z"
+    },
+    {
+      "id": "soal-005",
+      "mataKuliahId": "mk-004",
+      "mataKuliah": "Algoritma dan Struktur Data",
+      "pertanyaan": "Manakah yang merupakan kompleksitas waktu dari algoritma Binary Search?",
+      "jenis": "Pilihan Ganda",
+      "tingkatKesulitan": "Sedang",
+      "pilihan": [
+        "O(n)",
+        "O(log n)",
+        "O(n²)",
+        "O(1)"
+      ],
+      "jawabanBenar": 1,
+      "poin": 20,
+      "kategori": "Analisis Algoritma",
+      "tags": ["binary-search", "complexity", "big-o", "algorithm"],
+      "dosenId": "user-003",
+      "createdAt": "2024-01-29T00:00:00.000Z",
+      "updatedAt": "2024-01-29T00:00:00.000Z"
+    },
+    {
+      "id": "soal-006",
+      "mataKuliahId": "mk-002",
+      "mataKuliah": "Basis Data",
+      "pertanyaan": "Normalisasi database bertujuan untuk mengurangi redundansi data.",
+      "jenis": "True/False",
+      "tingkatKesulitan": "Mudah",
+      "jawabanBenar": "True",
+      "poin": 10,
+      "kategori": "Database Design",
+      "tags": ["normalization", "database", "redundancy"],
+      "dosenId": "user-002",
+      "createdAt": "2024-01-30T00:00:00.000Z",
+      "updatedAt": "2024-01-30T00:00:00.000Z"
+    }
+  ]
+}

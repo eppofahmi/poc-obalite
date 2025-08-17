@@ -1,78 +1,111 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-export interface User {
-  id: number
-  email: string
-  name: string
-  role: 'admin' | 'dosen'
-}
+import { authApi, ApiError } from '../services/api'
+import type { User, LoginRequest } from '../types/api'
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<User | null>(null)
   const isAuthenticated = ref(false)
+  const loading = ref(false)
+  const error = ref<string | null>(null)
 
-  const mockUsers: Record<string, { password: string; user: User }> = {
-    'admin@example.com': {
-      password: 'admin123',
-      user: {
-        id: 1,
-        email: 'admin@example.com',
-        name: 'Administrator',
-        role: 'admin'
-      }
-    },
-    'dosen@example.com': {
-      password: 'dosen123',
-      user: {
-        id: 2,
-        email: 'dosen@example.com',
-        name: 'Dr. John Doe',
-        role: 'dosen'
-      }
+  const login = async (email: string, password: string): Promise<boolean> => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const loginRequest: LoginRequest = { email, password }
+      const response = await authApi.login(loginRequest)
+      
+      user.value = response.data.user
+      isAuthenticated.value = true
+      
+      // Store auth data (in production, consider more secure storage)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
+      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('refreshToken', response.data.refreshToken)
+      
+      return true
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Login failed'
+      return false
+    } finally {
+      loading.value = false
     }
   }
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const userData = mockUsers[email]
-        
-        if (userData && userData.password === password) {
-          user.value = userData.user
-          isAuthenticated.value = true
-          localStorage.setItem('user', JSON.stringify(userData.user))
-          resolve(true)
-        } else {
-          resolve(false)
-        }
-      }, 1000)
-    })
+  const logout = async () => {
+    loading.value = true
+    error.value = null
+
+    try {
+      // Call logout API (optional - token will expire anyway)
+      await authApi.logout()
+    } catch (err) {
+      // Even if logout API fails, we should still clear local storage
+      console.warn('Logout API call failed:', err)
+    } finally {
+      // Clear local state and storage
+      user.value = null
+      isAuthenticated.value = false
+      loading.value = false
+      
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+      localStorage.removeItem('refreshToken')
+    }
   }
 
-  const logout = () => {
-    user.value = null
-    isAuthenticated.value = false
-    localStorage.removeItem('user')
-  }
+  const refreshProfile = async () => {
+    if (!isAuthenticated.value) return
 
-  const initializeAuth = () => {
-    const savedUser = localStorage.getItem('user')
-    if (savedUser) {
-      try {
-        user.value = JSON.parse(savedUser)
-        isAuthenticated.value = true
-      } catch (error) {
+    try {
+      const response = await authApi.getProfile()
+      user.value = response.data
+      localStorage.setItem('user', JSON.stringify(response.data))
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to refresh profile'
+      // If profile refresh fails, user might need to login again
+      if (err instanceof ApiError && err.statusCode === 401) {
         logout()
       }
     }
   }
 
+  const initializeAuth = () => {
+    const savedUser = localStorage.getItem('user')
+    const savedToken = localStorage.getItem('token')
+    
+    if (savedUser && savedToken) {
+      try {
+        user.value = JSON.parse(savedUser)
+        isAuthenticated.value = true
+        
+        // Optionally refresh profile to ensure data is current
+        // refreshProfile()
+      } catch (error) {
+        // If parsing fails, clear everything
+        logout()
+      }
+    }
+  }
+
+  const clearError = () => {
+    error.value = null
+  }
+
   return {
+    // State
     user,
     isAuthenticated,
+    loading,
+    error,
+    
+    // Actions
     login,
     logout,
-    initializeAuth
+    refreshProfile,
+    initializeAuth,
+    clearError
   }
 })
