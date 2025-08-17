@@ -38,7 +38,18 @@
 
     <!-- Table -->
     <template #table>
+      <div v-if="loading" class="text-center py-8">
+        <div class="loading-spinner"></div>
+        <p class="text-gray-600 mt-2">Loading mata kuliah...</p>
+      </div>
+      
+      <div v-else-if="error" class="text-center py-8">
+        <p class="text-red-600">{{ error }}</p>
+        <button @click="fetchMataKuliah" class="btn-primary mt-4">Retry</button>
+      </div>
+      
       <DataTable
+        v-else
         :columns="columns"
         :data="paginatedMataKuliahList"
         :row-key="'id'"
@@ -105,6 +116,10 @@
               <option value="Genap 2024/2025">Genap 2024/2025</option>
             </select>
           </div>
+          <div class="form-group">
+            <label>Deskripsi (Opsional)</label>
+            <textarea v-model="newMatkul.deskripsi" rows="3" placeholder="Deskripsi mata kuliah..."></textarea>
+          </div>
           <div class="modal-actions">
             <button type="button" @click="showModal = false" class="btn-cancel">Batal</button>
             <button type="submit" class="btn-save">Simpan</button>
@@ -115,21 +130,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Plus, Search, Edit2, Eye, Trash2 } from 'lucide-vue-next'
 import TableLayout from '../components/TableLayout.vue'
 import DataTable, { type TableColumn } from '../components/DataTable.vue'
 import TablePagination from '../components/TablePagination.vue'
-
-interface MataKuliah {
-  id: number
-  nama: string
-  kode: string
-  sks: number
-  semester: string
-  status: string
-  jumlahMahasiswa: number
-}
+import { mataKuliahApi } from '../services/api'
+import type { MataKuliah, CreateMataKuliahRequest, FilterParams } from '../types/api'
 
 // Table columns definition
 const columns: TableColumn[] = [
@@ -144,41 +151,16 @@ const columns: TableColumn[] = [
 
 // Reactive data
 const showModal = ref(false)
-const mataKuliahList = ref<MataKuliah[]>([
-  {
-    id: 1,
-    nama: 'Pemrograman Web',
-    kode: 'TI301',
-    sks: 3,
-    semester: 'Ganjil 2024/2025',
-    status: 'Aktif',
-    jumlahMahasiswa: 35
-  },
-  {
-    id: 2,
-    nama: 'Basis Data',
-    kode: 'TI302',
-    sks: 3,
-    semester: 'Ganjil 2024/2025',
-    status: 'Aktif',
-    jumlahMahasiswa: 42
-  },
-  {
-    id: 3,
-    nama: 'Mobile Programming',
-    kode: 'TI401',
-    sks: 4,
-    semester: 'Genap 2024/2025',
-    status: 'Persiapan',
-    jumlahMahasiswa: 0
-  }
-])
+const mataKuliahList = ref<MataKuliah[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
 
-const newMatkul = ref({
+const newMatkul = ref<CreateMataKuliahRequest>({
   nama: '',
   kode: '',
   sks: 1,
-  semester: ''
+  semester: '',
+  deskripsi: ''
 })
 
 // Filter and search states
@@ -194,49 +176,36 @@ const itemsPerPage = ref(10)
 const sortColumn = ref('')
 const sortDirection = ref<'asc' | 'desc'>('asc')
 
-// Computed properties
+// API methods
+const fetchMataKuliah = async () => {
+  loading.value = true
+  error.value = null
+  
+  try {
+    const filters: FilterParams = {
+      search: searchQuery.value || undefined,
+      status: statusFilter.value || undefined,
+      semester: semesterFilter.value || undefined,
+      page: currentPage.value,
+      limit: itemsPerPage.value,
+      sortBy: sortColumn.value || undefined,
+      sortOrder: sortDirection.value
+    }
+    
+    const response = await mataKuliahApi.getAll(filters)
+    mataKuliahList.value = response.data
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to fetch mata kuliah'
+    console.error('Fetch mata kuliah error:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Computed properties  
 const filteredMataKuliahList = computed(() => {
-  let filtered = mataKuliahList.value
-
-  // Apply search filter
-  if (searchQuery.value) {
-    filtered = filtered.filter(matkul => 
-      matkul.nama.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      matkul.kode.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
-  }
-
-  // Apply status filter
-  if (statusFilter.value) {
-    filtered = filtered.filter(matkul => matkul.status === statusFilter.value)
-  }
-
-  // Apply semester filter
-  if (semesterFilter.value) {
-    filtered = filtered.filter(matkul => matkul.semester === semesterFilter.value)
-  }
-
-  // Apply sorting
-  if (sortColumn.value) {
-    filtered.sort((a, b) => {
-      const aVal = a[sortColumn.value as keyof MataKuliah]
-      const bVal = b[sortColumn.value as keyof MataKuliah]
-      
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sortDirection.value === 'asc' 
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal)
-      }
-      
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortDirection.value === 'asc' ? aVal - bVal : bVal - aVal
-      }
-      
-      return 0
-    })
-  }
-
-  return filtered
+  // Since we're using API filtering, return the data as-is
+  return mataKuliahList.value
 })
 
 const paginatedMataKuliahList = computed(() => {
@@ -253,11 +222,34 @@ const handleSort = (column: string) => {
     sortColumn.value = column
     sortDirection.value = 'asc'
   }
+  
+  // Refetch data with new sorting
+  fetchMataKuliah()
 }
 
 const handleRowClick = (item: MataKuliah, index: number) => {
   console.log('Row clicked:', item, index)
 }
+
+// Watch for filter changes and refetch data
+const debounceTimer = ref<NodeJS.Timeout | null>(null)
+
+const debouncedFetch = () => {
+  if (debounceTimer.value) {
+    clearTimeout(debounceTimer.value)
+  }
+  
+  debounceTimer.value = setTimeout(() => {
+    currentPage.value = 1 // Reset to first page when filtering
+    fetchMataKuliah()
+  }, 300)
+}
+
+// Watch for filter changes
+watch(searchQuery, () => debouncedFetch())
+watch(statusFilter, () => fetchMataKuliah())
+watch(semesterFilter, () => fetchMataKuliah())
+watch(currentPage, () => fetchMataKuliah())
 
 const editMataKuliah = (matkul: MataKuliah) => {
   console.log('Edit mata kuliah:', matkul.nama)
@@ -267,27 +259,40 @@ const viewDetail = (matkul: MataKuliah) => {
   console.log('View detail:', matkul.nama)
 }
 
-const deleteMataKuliah = (matkul: MataKuliah) => {
+const deleteMataKuliah = async (matkul: MataKuliah) => {
   if (confirm(`Apakah Anda yakin ingin menghapus mata kuliah ${matkul.nama}?`)) {
-    const index = mataKuliahList.value.findIndex(item => item.id === matkul.id)
-    if (index !== -1) {
-      mataKuliahList.value.splice(index, 1)
+    try {
+      await mataKuliahApi.delete(matkul.id)
+      // Remove from local list or refetch data
+      const index = mataKuliahList.value.findIndex(item => item.id === matkul.id)
+      if (index !== -1) {
+        mataKuliahList.value.splice(index, 1)
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to delete mata kuliah'
+      console.error('Delete mata kuliah error:', err)
     }
   }
 }
 
-const addMataKuliah = () => {
-  const id = Math.max(...mataKuliahList.value.map(m => m.id)) + 1
-  mataKuliahList.value.push({
-    id,
-    ...newMatkul.value,
-    status: 'Persiapan',
-    jumlahMahasiswa: 0
-  })
-  
-  newMatkul.value = { nama: '', kode: '', sks: 1, semester: '' }
-  showModal.value = false
+const addMataKuliah = async () => {
+  try {
+    const response = await mataKuliahApi.create(newMatkul.value)
+    mataKuliahList.value.push(response.data)
+    
+    // Reset form
+    newMatkul.value = { nama: '', kode: '', sks: 1, semester: '', deskripsi: '' }
+    showModal.value = false
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to create mata kuliah'
+    console.error('Create mata kuliah error:', err)
+  }
 }
+
+// Initialize data
+onMounted(() => {
+  fetchMataKuliah()
+})
 </script>
 
 <style scoped>
@@ -490,7 +495,8 @@ const addMataKuliah = () => {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--oba-border);
@@ -498,10 +504,17 @@ const addMataKuliah = () => {
   font-size: 0.875rem;
   background: var(--oba-white);
   transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: var(--oba-primary);
   box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
@@ -546,6 +559,22 @@ const addMataKuliah = () => {
   background-color: #047857;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--oba-border);
+  border-top: 4px solid var(--oba-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Responsive Design */

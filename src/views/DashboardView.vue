@@ -44,7 +44,7 @@
             <GraduationCap :size="24" />
           </div>
           <div class="stat-content">
-            <h3>45</h3>
+            <h3>{{ adminStats?.totalMataKuliah || 0 }}</h3>
             <p>Total Courses</p>
           </div>
         </div>
@@ -53,7 +53,7 @@
             <Users :size="24" />
           </div>
           <div class="stat-content">
-            <h3>28</h3>
+            <h3>{{ adminStats?.totalDosen || 0 }}</h3>
             <p>Active Lecturers</p>
           </div>
         </div>
@@ -62,7 +62,7 @@
             <FileText :size="24" />
           </div>
           <div class="stat-content">
-            <h3>32</h3>
+            <h3>{{ adminStats?.totalRPS || 0 }}</h3>
             <p>RPS Completed</p>
           </div>
         </div>
@@ -71,8 +71,8 @@
             <CheckCircle :size="24" />
           </div>
           <div class="stat-content">
-            <h3>18</h3>
-            <p>Assessments Done</p>
+            <h3>{{ adminStats?.totalSoal || 0 }}</h3>
+            <p>Total Questions</p>
           </div>
         </div>
       </template>
@@ -83,7 +83,7 @@
             <Book :size="24" />
           </div>
           <div class="stat-content">
-            <h3>3</h3>
+            <h3>{{ dosenStats?.totalMataKuliah || 0 }}</h3>
             <p>Assigned Courses</p>
           </div>
         </div>
@@ -92,7 +92,7 @@
             <Users :size="24" />
           </div>
           <div class="stat-content">
-            <h3>85</h3>
+            <h3>{{ dosenStats?.mataKuliahAktif?.reduce((sum, mk) => sum + mk.jumlahMahasiswa, 0) || 0 }}</h3>
             <p>Total Students</p>
           </div>
         </div>
@@ -101,8 +101,8 @@
             <ListChecks :size="24" />
           </div>
           <div class="stat-content">
-            <h3>12</h3>
-            <p>Pending Assessments</p>
+            <h3>{{ dosenStats?.totalSoal || 0 }}</h3>
+            <p>Total Questions</p>
           </div>
         </div>
         <div class="stat-card">
@@ -110,8 +110,8 @@
             <FileImage :size="24" />
           </div>
           <div class="stat-content">
-            <h3>2</h3>
-            <p>Portfolios Generated</p>
+            <h3>{{ dosenStats?.totalPortofolio || 0 }}</h3>
+            <p>Portfolio Items</p>
           </div>
         </div>
       </template>
@@ -127,32 +127,23 @@
         </div>
         <div class="card-content">
           <div class="activity-list">
-            <div class="activity-item">
+            <div v-if="loading" class="text-center py-4">
+              Loading activities...
+            </div>
+            <div v-else-if="error" class="text-center py-4 text-red-600">
+              {{ error }}
+            </div>
+            <div v-else-if="adminStats?.aktivitasTerkini" class="activity-item" v-for="activity in adminStats.aktivitasTerkini" :key="activity.id">
               <div class="activity-icon">
                 <Upload :size="20" />
               </div>
               <div class="activity-content">
-                <p><strong>Dr. Sari</strong> uploaded grade template for AKT2201</p>
-                <span class="activity-time">2 hours ago</span>
+                <p><strong>{{ activity.user }}</strong> {{ activity.action }} {{ activity.resource }}</p>
+                <span class="activity-time">{{ formatTime(activity.timestamp) }}</span>
               </div>
             </div>
-            <div class="activity-item">
-              <div class="activity-icon">
-                <FileText :size="20" />
-              </div>
-              <div class="activity-content">
-                <p><strong>Admin</strong> created RPS for Akuntansi Sektor Publik</p>
-                <span class="activity-time">4 hours ago</span>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon">
-                <Printer :size="20" />
-              </div>
-              <div class="activity-content">
-                <p>Question set printed for MNG3201</p>
-                <span class="activity-time">1 day ago</span>
-              </div>
+            <div v-else class="text-center py-4 text-gray-500">
+              No recent activities
             </div>
           </div>
         </div>
@@ -166,27 +157,36 @@
         </div>
         <div class="card-content">
           <div class="course-list">
-            <div class="course-item" v-for="course in lecturerCourses" :key="course.id">
+            <div v-if="loading" class="text-center py-4">
+              Loading courses...
+            </div>
+            <div v-else-if="error" class="text-center py-4 text-red-600">
+              {{ error }}
+            </div>
+            <div v-else-if="dosenStats?.mataKuliahAktif" class="course-item" v-for="course in dosenStats.mataKuliahAktif" :key="course.id">
               <div class="course-info">
-                <div class="course-code">{{ course.code }}</div>
+                <div class="course-code">{{ course.kode }}</div>
                 <div class="course-details">
-                  <h4>{{ course.name }}</h4>
+                  <h4>{{ course.nama }}</h4>
                   <div class="course-meta">
-                    <span><Users :size="16" /> {{ course.students }} students</span>
-                    <span><Calendar :size="16" /> {{ course.class }}</span>
+                    <span><Users :size="16" /> {{ course.jumlahMahasiswa }} students</span>
+                    <span><Calendar :size="16" /> {{ course.semester }}</span>
                   </div>
                 </div>
               </div>
               <div class="course-actions">
-                <div class="progress-circle" :data-progress="course.progress">
+                <div class="progress-circle" :data-progress="dosenStats?.rpsProgress || 0">
                   <svg>
                     <circle cx="20" cy="20" r="18"></circle>
-                    <circle cx="20" cy="20" r="18" :style="`stroke-dasharray: 113; stroke-dashoffset: ${113 - (course.progress * 113 / 100)};`"></circle>
+                    <circle cx="20" cy="20" r="18" :style="`stroke-dasharray: 113; stroke-dashoffset: ${113 - ((dosenStats?.rpsProgress || 0) * 113 / 100)};`"></circle>
                   </svg>
-                  <span>{{ course.progress }}%</span>
+                  <span>{{ dosenStats?.rpsProgress || 0 }}%</span>
                 </div>
                 <button class="btn-secondary">Manage</button>
               </div>
+            </div>
+            <div v-else class="text-center py-4 text-gray-500">
+              No active courses
             </div>
           </div>
         </div>
@@ -200,30 +200,48 @@
         </div>
         <div class="card-content">
           <div v-if="userStore.user?.role === 'admin'" class="progress-list">
-            <div class="progress-item" v-for="course in courseProgress" :key="course.code">
+            <div v-if="loading" class="text-center py-4">
+              Loading progress...
+            </div>
+            <div v-else-if="error" class="text-center py-4 text-red-600">
+              {{ error }}
+            </div>
+            <div v-else-if="adminStats?.rpsPerStatus" class="progress-item" v-for="(count, status) in adminStats.rpsPerStatus" :key="status">
               <div class="progress-info">
-                <span class="course-code">{{ course.code }}</span>
-                <span class="course-name">{{ course.name }}</span>
+                <span class="course-code">{{ status }}</span>
+                <span class="course-name">RPS Status</span>
               </div>
               <div class="progress-bar-container">
                 <div class="progress-bar">
-                  <div class="progress-fill" :style="`width: ${course.progress}%`"></div>
+                  <div class="progress-fill" :style="`width: ${(count / adminStats.totalRPS) * 100}%`"></div>
                 </div>
-                <span class="progress-percentage">{{ course.progress }}%</span>
+                <span class="progress-percentage">{{ count }}</span>
               </div>
+            </div>
+            <div v-else class="text-center py-4 text-gray-500">
+              No progress data available
             </div>
           </div>
           
           <div v-else class="task-list">
-            <div class="task-item" v-for="task in pendingTasks" :key="task.id" :class="task.priority">
+            <div v-if="loading" class="text-center py-4">
+              Loading tasks...
+            </div>
+            <div v-else-if="error" class="text-center py-4 text-red-600">
+              {{ error }}
+            </div>
+            <div v-else-if="dosenStats?.deadlineTerdekat" class="task-item" v-for="task in dosenStats.deadlineTerdekat" :key="task.id" :class="task.priority.toLowerCase()">
               <div class="task-priority"></div>
               <div class="task-content">
                 <h5>{{ task.title }}</h5>
-                <p>Due: {{ task.due }}</p>
+                <p>Due: {{ formatDate(task.dueDate) }}</p>
               </div>
               <div class="task-actions">
-                <button class="btn-primary btn-sm">{{ task.action }}</button>
+                <button class="btn-primary btn-sm">View</button>
               </div>
+            </div>
+            <div v-else class="text-center py-4 text-gray-500">
+              No pending tasks
             </div>
           </div>
         </div>
@@ -302,14 +320,23 @@
           </div>
           
           <div v-else class="assessment-overview">
-            <div class="assessment-type" v-for="assessment in assessmentOverview" :key="assessment.name">
+            <div v-if="loading" class="text-center py-4">
+              Loading assessment data...
+            </div>
+            <div v-else-if="error" class="text-center py-4 text-red-600">
+              {{ error }}
+            </div>
+            <div v-else-if="dosenStats" class="assessment-type">
               <div class="assessment-header">
-                <span class="assessment-name">{{ assessment.name }}</span>
-                <span class="assessment-progress">{{ assessment.completed }}/{{ assessment.total }} completed</span>
+                <span class="assessment-name">RPS Progress</span>
+                <span class="assessment-progress">{{ dosenStats.rpsProgress }}% completed</span>
               </div>
               <div class="progress-bar">
-                <div class="progress-fill" :style="`width: ${(assessment.completed / assessment.total) * 100}%`"></div>
+                <div class="progress-fill" :style="`width: ${dosenStats.rpsProgress}%`"></div>
               </div>
+            </div>
+            <div v-else class="text-center py-4 text-gray-500">
+              No assessment data available
             </div>
           </div>
         </div>
@@ -321,8 +348,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
+import { dashboardApi } from '../services/api'
+import type { DashboardStats } from '../types/api'
 import { 
   GraduationCap, Users, FileText, CheckCircle, Book, ListChecks, FileImage,
   Upload, Printer, Calendar, Plus, FileBarChart, Edit, HelpCircle, RotateCcw
@@ -335,37 +364,83 @@ const selectedPeriod = ref('current')
 const selectedFaculty = ref('all')
 const selectedCourse = ref('all')
 
+// Dashboard data
+const dashboardData = ref<DashboardStats['admin'] | DashboardStats['dosen'] | null>(null)
+const loading = ref(false)
+const error = ref<string | null>(null)
+
+// Computed properties based on user role
+const adminStats = computed(() => {
+  if (userStore.user?.role === 'admin' && dashboardData.value) {
+    return dashboardData.value as DashboardStats['admin']
+  }
+  return null
+})
+
+const dosenStats = computed(() => {
+  if (userStore.user?.role === 'dosen' && dashboardData.value) {
+    return dashboardData.value as DashboardStats['dosen']
+  }
+  return null
+})
+
 // Methods
-const refreshData = () => {
-  console.log('Refreshing dashboard data...')
-  // Implement refresh logic here
+const fetchDashboardData = async () => {
+  if (!userStore.user?.role) return
+  
+  loading.value = true
+  error.value = null
+  
+  try {
+    const response = await dashboardApi.getStats(userStore.user.role)
+    dashboardData.value = response.data
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to fetch dashboard data'
+    console.error('Dashboard data fetch error:', err)
+  } finally {
+    loading.value = false
+  }
 }
 
-const lecturerCourses = ref([
-  { id: 1, code: 'AKT2201', name: 'Akuntansi Sektor Publik', students: 30, class: 'Kelas A', progress: 85 },
-  { id: 2, code: 'MNG3201', name: 'Manajemen Strategis', students: 28, class: 'Kelas B', progress: 60 },
-  { id: 3, code: 'EKO1101', name: 'Mikroekonomi', students: 27, class: 'Kelas A', progress: 40 }
-])
+const refreshData = () => {
+  fetchDashboardData()
+}
 
-const courseProgress = ref([
-  { code: 'AKT2201', name: 'Akuntansi Sektor Publik', progress: 85 },
-  { code: 'MNG3201', name: 'Manajemen Strategis', progress: 60 },
-  { code: 'EKO1101', name: 'Mikroekonomi', progress: 40 }
-])
+// Utility functions
+const formatTime = (timestamp: string): string => {
+  const now = new Date()
+  const time = new Date(timestamp)
+  const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60))
+  
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} minutes ago`
+  }
+  
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) {
+    return `${diffInHours} hours ago`
+  }
+  
+  const diffInDays = Math.floor(diffInHours / 24)
+  return `${diffInDays} days ago`
+}
 
-const pendingTasks = ref([
-  { id: 1, title: 'Upload UTS Questions - AKT2201', due: 'Tomorrow', priority: 'urgent', action: 'Upload' },
-  { id: 2, title: 'Grade Quiz Results - MNG3201', due: '3 days', priority: 'high', action: 'Grade' },
-  { id: 3, title: 'Complete Self Evaluation', due: '1 week', priority: 'medium', action: 'Complete' },
-  { id: 4, title: 'Upload Participation Scores', due: '1 week', priority: 'medium', action: 'Upload' }
-])
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInDays = Math.floor((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  
+  if (diffInDays === 0) return 'Today'
+  if (diffInDays === 1) return 'Tomorrow'
+  if (diffInDays > 1 && diffInDays <= 7) return `${diffInDays} days`
+  
+  return date.toLocaleDateString()
+}
 
-const assessmentOverview = ref([
-  { name: 'Quiz', completed: 8, total: 12 },
-  { name: 'UTS', completed: 2, total: 3 },
-  { name: 'Projects', completed: 1, total: 3 },
-  { name: 'UAS', completed: 0, total: 3 }
-])
+// Initialize dashboard data
+onMounted(() => {
+  fetchDashboardData()
+})
 </script>
 
 <style scoped>
