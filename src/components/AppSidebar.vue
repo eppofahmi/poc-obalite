@@ -1,46 +1,46 @@
 <template>
   <aside class="app-sidebar">
     <nav class="sidebar-nav">
-      <ul class="menu-list">
-        <li>
+      <div class="menu-list">
+        <div class="nav-item">
           <RouterLink to="/dashboard" class="menu-item">
             <BarChart3 :size="20" />
             <span class="menu-text">Dashboard</span>
           </RouterLink>
-        </li>
+        </div>
         
         <!-- Admin Menu -->
         <template v-if="userStore.user?.role === 'admin'">
-          <li>
+          <div class="nav-item">
             <RouterLink to="/manajemen-rps" class="menu-item">
               <FileText :size="20" />
               <span class="menu-text">Manajemen RPS</span>
             </RouterLink>
-          </li>
+          </div>
         </template>
 
         <!-- Dosen Menu -->
         <template v-if="userStore.user?.role === 'dosen'">
-          <li>
+          <div class="nav-item">
             <RouterLink to="/manajemen-mata-kuliah" class="menu-item">
               <Book :size="20" />
               <span class="menu-text">Manajemen Mata Kuliah</span>
             </RouterLink>
-          </li>
-          <li>
+          </div>
+          <div class="nav-item">
             <RouterLink to="/manajemen-soal" class="menu-item">
               <HelpCircle :size="20" />
               <span class="menu-text">Manajemen Soal</span>
             </RouterLink>
-          </li>
-          <li>
+          </div>
+          <div class="nav-item">
             <RouterLink to="/portofolio" class="menu-item">
               <FileImage :size="20" />
               <span class="menu-text">Portofolio</span>
             </RouterLink>
-          </li>
+          </div>
         </template>
-      </ul>
+      </div>
     </nav>
   </aside>
 </template>
@@ -67,8 +67,7 @@ const userStore = useUserStore()
   overflow-y: auto;
 }
 
-.nav-menu {
-  list-style: none;
+.menu-list {
   margin: 0;
   padding: 0;
 }
