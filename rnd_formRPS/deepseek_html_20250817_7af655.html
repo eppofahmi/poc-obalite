@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form RPS Lengkap</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="form-container">
+    <h1>FORM RENCANA PEMBELAJARAN SEMESTER (RPS)</h1>
+    
+    <!-- Tab Navigation -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="identitas">1. Identitas</button>
+      <button class="tab-btn" data-tab="deskripsi">2. Deskripsi</button>
+      <button class="tab-btn" data-tab="cpl">3. CPL</button>
+      <button class="tab-btn" data-tab="cpmk">4. CPMK</button>
+      <button class="tab-btn" data-tab="materi">5. Materi</button>
+      <button class="tab-btn" data-tab="metode">6. Metode</button>
+      <button class="tab-btn" data-tab="pengalaman">7. Pengalaman</button>
+      <button class="tab-btn" data-tab="media">8. Media</button>
+      <button class="tab-btn" data-tab="penilaian">9. Penilaian</button>
+      <button class="tab-btn" data-tab="referensi">10. Referensi</button>
+      <button class="tab-btn" data-tab="dosen">11. Dosen</button>
+      <button class="tab-btn" data-tab="otorisasi">12. Otorisasi</button>
+    </div>
+
+    <!-- Tab Contents -->
+    <!-- 1. Identitas RPS -->
+    <div id="identitas" class="tab-content active">
+      <h2>1. Identitas RPS</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Kode Mata Kuliah</label>
+          <input type="text" id="kode-mk" required>
+        </div>
+        <div class="form-group">
+          <label>Nama Mata Kuliah</label>
+          <input type="text" id="nama-mk" required>
+        </div>
+        <div class="form-group">
+          <label>Bobot SKS</label>
+          <div class="sks-container">
+            <input type="number" id="sks-teori" placeholder="Teori" min="0"> /
+            <input type="number" id="sks-praktik" placeholder="Praktik" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Status Mata Kuliah</label>
+          <select id="status-mk">
+            <option value="wajib">Wajib</option>
+            <option value="pilihan">Pilihan</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mata Kuliah Prasyarat</label>
+          <input type="text" id="prasyarat" placeholder="Kosongkan jika tidak ada">
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Deskripsi Singkat -->
+    <div id="deskripsi" class="tab-content">
+      <h2>2. Deskripsi Singkat Mata Kuliah</h2>
+      <textarea id="deskripsi-mk" rows="6" placeholder="Masukkan deskripsi lengkap..."></textarea>
+    </div>
+
+    <!-- 3. CPL -->
+    <div id="cpl" class="tab-content">
+      <h2>3. Capaian Pembelajaran Lulusan (CPL)</h2>
+      <table id="tabel-cpl">
+        <thead>
+          <tr>
+            <th width="20%">Kode CPL</th>
+            <th width="70%">Deskripsi CPL</th>
+            <th width="10%">Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn-add" onclick="addRow('cpl')">+ Tambah CPL</button>
+    </div>
+
+    <!-- 4. CPMK -->
+    <div id="cpmk" class="tab-content">
+      <h2>4. Capaian Pembelajaran Mata Kuliah (CPMK)</h2>
+      <table id="tabel-cpmk">
+        <thead>
+          <tr>
+            <th width="20%">Kode CPMK</th>
+            <th width="70%">Deskripsi CPMK</th>
+            <th width="10%">Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn-add" onclick="addRow('cpmk')">+ Tambah CPMK</button>
+    </div>
+
+    <!-- 5. Materi Pembelajaran -->
+    <div id="materi" class="tab-content">
+      <h2>5. Materi Pembelajaran</h2>
+      <table id="tabel-materi">
+        <thead>
+          <tr>
+            <th width="15%">Kode CPMK</th>
+            <th width="45%">Materi Pembelajaran</th>
+            <th width="20%">Bentuk Pembelajaran</th>
+            <th width="15%">Alokasi Waktu</th>
+            <th width="5%">Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn-add" onclick="addRow('materi')">+ Tambah Materi</button>
+    </div>
+
+    <!-- 6. Metode Pembelajaran -->
+    <div id="metode" class="tab-content">
+      <h2>6. Metode Pembelajaran</h2>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="metode" value="diskusi"> Small Group Discussion</label>
+        <label><input type="checkbox" name="metode" value="project"> Project-Based Learning</label>
+        <label><input type="checkbox" name="metode" value="roleplay"> Role-Play & Simulation</label>
+        <label><input type="checkbox" name="metode" value="lainnya"> Lainnya: <input type="text" id="metode-lain"></label>
+      </div>
+    </div>
+
+    <!-- 7. Pengalaman Belajar -->
+    <div id="pengalaman" class="tab-content">
+      <h2>7. Pengalaman Belajar Mahasiswa</h2>
+      <textarea id="pengalaman-belajar" rows="4" placeholder="Contoh: Presentasi kasus, diskusi kelompok..."></textarea>
+    </div>
+
+    <!-- 8. Media Pembelajaran -->
+    <div id="media" class="tab-content">
+      <h2>8. Media Pembelajaran</h2>
+      <div class="form-group">
+        <label>Link LMS</label>
+        <input type="url" id="link-lms" placeholder="https://">
+      </div>
+      <div class="form-group">
+        <label>Presentase Pembelajaran</label>
+        <div class="percentage-container">
+          <input type="number" id="presentase-luring" min="0" max="100" placeholder="Luring"> %
+          <input type="number" id="presentase-daring" min="0" max="100" placeholder="Daring"> %
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Penilaian -->
+    <div id="penilaian" class="tab-content">
+      <h2>9. Metode Penilaian</h2>
+      <table id="tabel-penilaian">
+        <thead>
+          <tr>
+            <th width="20%">Basis Evaluasi</th>
+            <th width="25%">Komponen</th>
+            <th width="15%">Bobot (%)</th>
+            <th width="25%">CPMK Terkait</th>
+            <th width="10%">Bobot CPMK</th>
+            <th width="5%">Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn-add" onclick="addRow('penilaian')">+ Tambah Baris</button>
+    </div>
+
+    <!-- 10. Referensi -->
+    <div id="referensi" class="tab-content">
+      <h2>10. Daftar Referensi</h2>
+      <table id="tabel-referensi">
+        <thead>
+          <tr>
+            <th width="5%">No</th>
+            <th width="45%">Judul</th>
+            <th width="25%">Pengarang</th>
+            <th width="15%">Tahun</th>
+            <th width="10%">Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn-add" onclick="addRow('referensi')">+ Tambah Referensi</button>
+    </div>
+
+    <!-- 11. Dosen Pengampu -->
+    <div id="dosen" class="tab-content">
+      <h2>11. Dosen Pengampu</h2>
+      <table id="tabel-dosen">
+        <thead>
+          <tr>
+            <th width="30%">Nama Dosen</th>
+            <th width="20%">Gelar</th>
+            <th width="40%">Peran</th>
+            <th width="10%">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" placeholder="Nama lengkap"></td>
+            <td><input type="text" placeholder="S.E., M.Acc."></td>
+            <td>
+              <select>
+                <option>Pengampu Utama</option>
+                <option>Team Teaching</option>
+              </select>
+            </td>
+            <td><button class="btn-delete">Hapus</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-add" onclick="addRow('dosen')">+ Tambah Dosen</button>
+    </div>
+
+    <!-- 12. Otorisasi -->
+    <div id="otorisasi" class="tab-content">
+      <h2>12. Otorisasi</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tanggal Penyusunan</label>
+          <input type="date" id="tanggal">
+        </div>
+        <div class="form-group">
+          <label>Koordinator Mata Kuliah</label>
+          <input type="text" id="koordinator-mk" placeholder="Nama lengkap">
+        </div>
+        <div class="form-group">
+          <label>Koordinator Bidang Keahlian</label>
+          <input type="text" id="koordinator-keahlian" placeholder="Opsional">
+        </div>
+        <div class="form-group">
+          <label>Ketua Program Studi</label>
+          <input type="text" id="kaprodi" placeholder="Nama lengkap">
+        </div>
+      </div>
+      <div class="signature-container">
+        <div class="signature-box">
+          <p>Koordinator Mata Kuliah</p>
+          <div class="signature-line"></div>
+        </div>
+        <div class="signature-box">
+          <p>Ketua Program Studi</p>
+          <div class="signature-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+      <button class="btn-nav" id="prev-btn">Sebelumnya</button>
+      <span id="tab-indicator">1/12</span>
+      <button class="btn-nav" id="next-btn">Berikutnya</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@
   >
     <!-- Header Actions -->
     <template #headerActions>
-      <button class="btn-primary" @click="showAddModal = true">
+      <button class="btn-primary" @click="navigateToAddRPS">
         <Plus :size="18" />
         Tambah RPS Baru
       </button>
@@ -83,10 +83,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { Plus, Search, Edit2, Eye, Trash2 } from 'lucide-vue-next'
 import TableLayout from '../components/TableLayout.vue'
 import DataTable, { type TableColumn } from '../components/DataTable.vue'
 import TablePagination from '../components/TablePagination.vue'
+
+const router = useRouter()
 
 interface RPS {
   id: number
@@ -121,7 +124,6 @@ const rpsList = ref<RPS[]>([
 const searchQuery = ref('')
 const statusFilter = ref('')
 const semesterFilter = ref('')
-const showAddModal = ref(false)
 
 // Pagination states
 const currentPage = ref(1)
@@ -210,6 +212,10 @@ const deleteRPS = (rps: RPS) => {
       rpsList.value.splice(index, 1)
     }
   }
+}
+
+const navigateToAddRPS = () => {
+  router.push('/manajemen-rps/tambah')
 }
 </script>
 
