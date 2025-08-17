@@ -1,6 +1,12 @@
 # OBA System - UNU Yogyakarta
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/obalite/deploy-status)](https://app.netlify.com/sites/obalite/deploys)
+
 **Outcome-Based Assessment System** - A comprehensive web application for managing educational assessments, course management, and academic portfolios at Universitas Nahdlatul Ulama Yogyakarta.
+
+## 🌐 Live Demo
+
+The application is deployed and available at: [https://obalite.netlify.app](https://obalite.netlify.app)
 
 ## 🎯 Features
 
